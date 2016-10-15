@@ -61,11 +61,7 @@ void ForestTypeRdbSave(RedisModuleIO *io, void *ptr) {
 }
 
 void ForestTypeAofRewrite(RedisModuleIO *aof, RedisModuleString *key,
-                          void *value) {
-  // Tree *t = value;
-  //   RedisModule_EmitAOF(aof, "ForestType.SET", "scc", key,
-  //   r->value,r->value_len, r->token, r->token_len);
-}
+                          void *value) {}
 
 void ForestTypeDigest(RedisModuleDigest *digest, void *value) {}
 
@@ -88,7 +84,7 @@ static int cmp2D(const void *p1, const void *p2) {
   return (int)(((const double *)p2)[1] - ((const double *)p1)[1]);
 }
 
-// rediforest.RUN <forest> <data_item> [CLASSIFICATION|REGRESSION]
+// ml.forest.run <forest> <data_item> [CLASSIFICATION|REGRESSION]
 int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   if (argc < 3) {
     return RedisModule_WrongArity(ctx);
@@ -524,6 +520,32 @@ int MatrixScaleCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   return REDISMODULE_OK;
 }
 
+/*
+* Get a matrix
+*/
+int MatrixGetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+  if (argc != 2) {
+    return RedisModule_WrongArity(ctx);
+  }
+  RedisModule_AutoMemory(ctx);
+
+  Matrix *m;
+  RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
+  int type = RedisModule_KeyType(key);
+  if (type == REDISMODULE_KEYTYPE_EMPTY ||
+      RedisModule_ModuleTypeGetType(key) != MatrixType) {
+    return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+  }
+  m = RedisModule_ModuleTypeGetValue(key);
+  RedisModule_ReplyWithArray(ctx, m->rows * m->cols + 2);
+  RedisModule_ReplyWithLongLong(ctx, m->rows);
+  RedisModule_ReplyWithLongLong(ctx, m->cols);
+  for (int i = 0; i < m->rows * m->cols; i++) {
+    RedisModule_ReplyWithDouble(ctx, m->values[i]);
+  }
+  return REDISMODULE_OK;
+}
+
 int MatrixPrintCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
                        int argc) {
   if (argc != 2) {
@@ -587,6 +609,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
       MatrixTypeFree);
 
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.set", MatrixSetCommand);
+  RMUtil_RegisterWriteCmd(ctx, "ml.matrix.get", MatrixGetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.multiply", MatrixMultiplyCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.add", MatrixAddCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.scale", MatrixScaleCommand);
