@@ -268,7 +268,12 @@ int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   }
 
   LinReg *lr;
-  lr = malloc(sizeof(LinReg));
+  if (type == REDISMODULE_KEYTYPE_EMPTY) {
+    lr = malloc(sizeof(LinReg));
+    RedisModule_ModuleTypeSetValue(key, LinRegType, lr);
+  } else {
+    lr = RedisModule_ModuleTypeGetValue(key);
+  }
   lr->clen = argc - 2;
   lr->coefficients = malloc(lr->clen * sizeof(double));
   RMUtil_ParseArgs(argv, argc, 2, "d", &lr->intercept);
@@ -277,7 +282,6 @@ int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     RMUtil_ParseArgs(argv, argc, argIdx, "d", &lr->coefficients[argIdx - 3]);
     argIdx++;
   }
-  RedisModule_ModuleTypeSetValue(key, LinRegType, lr);
   RedisModule_ReplyWithSimpleString(ctx, "OK");
   return REDISMODULE_OK;
 }
@@ -350,7 +354,12 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   }
 
   Matrix *m;
-  m = malloc(sizeof(Matrix));
+  if (type == REDISMODULE_KEYTYPE_EMPTY) {
+    m = malloc(sizeof(Matrix));
+    RedisModule_ModuleTypeSetValue(key, MatrixType, m);
+  } else {
+    m = RedisModule_ModuleTypeGetValue(key);
+  }
   RMUtil_ParseArgs(argv, argc, 2, "ll", &(m->rows), &(m->cols));
   LG_DEBUG("rows: %lld, cols: %lld\n", m->rows, m->cols);
   m->values = malloc(m->cols * m->rows * sizeof(double));
@@ -359,7 +368,6 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     RMUtil_ParseArgs(argv, argc, argIdx, "d", &m->values[argIdx - 4]);
     argIdx++;
   }
-  RedisModule_ModuleTypeSetValue(key, MatrixType, m);
   RedisModule_ReplyWithSimpleString(ctx, "OK");
   return REDISMODULE_OK;
 }
@@ -399,12 +407,89 @@ int MatrixMultiplyCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
   }
 
-  c = malloc(sizeof(Matrix));
+  if (type == REDISMODULE_KEYTYPE_EMPTY) {
+    c = malloc(sizeof(Matrix));
+    RedisModule_ModuleTypeSetValue(key, MatrixType, c);
+  } else {
+    c = RedisModule_ModuleTypeGetValue(key);
+  }
   c->rows = a->rows;
   c->cols = b->cols;
   c->values = malloc(c->cols * c->rows * sizeof(double));
   MatrixMultiply(*a, *b, *c);
-  RedisModule_ModuleTypeSetValue(key, MatrixType, c);
+  RedisModule_ReplyWithSimpleString(ctx, "OK");
+  return REDISMODULE_OK;
+}
+
+/*Add matrices c=a+b. a and b are existng keys and c should be new /
+* overwritten
+* ml.matrix.add a b c
+*/
+int MatrixAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+  if (argc != 4) {
+    return RedisModule_WrongArity(ctx);
+  }
+  RedisModule_AutoMemory(ctx);
+
+  Matrix *a, *b, *c;
+  RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
+  int type = RedisModule_KeyType(key);
+  if (type == REDISMODULE_KEYTYPE_EMPTY ||
+      RedisModule_ModuleTypeGetType(key) != MatrixType) {
+    return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+  }
+  a = RedisModule_ModuleTypeGetValue(key);
+
+  key = RedisModule_OpenKey(ctx, argv[2], REDISMODULE_READ);
+  type = RedisModule_KeyType(key);
+  if (type == REDISMODULE_KEYTYPE_EMPTY ||
+      RedisModule_ModuleTypeGetType(key) != MatrixType) {
+    return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+  }
+  b = RedisModule_ModuleTypeGetValue(key);
+
+  key = RedisModule_OpenKey(ctx, argv[3], REDISMODULE_READ | REDISMODULE_WRITE);
+  type = RedisModule_KeyType(key);
+  if (type != REDISMODULE_KEYTYPE_EMPTY &&
+      RedisModule_ModuleTypeGetType(key) != MatrixType) {
+    return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+  }
+
+  if (type == REDISMODULE_KEYTYPE_EMPTY) {
+    c = malloc(sizeof(Matrix));
+    RedisModule_ModuleTypeSetValue(key, MatrixType, c);
+  } else {
+    c = RedisModule_ModuleTypeGetValue(key);
+  }
+  c->rows = a->rows;
+  c->cols = b->cols;
+  c->values = malloc(c->cols * c->rows * sizeof(double));
+  MatrixAdd(*a, *b, *c);
+  RedisModule_ReplyWithSimpleString(ctx, "OK");
+  return REDISMODULE_OK;
+}
+
+/*Scale matrix m by scalar n
+* ml.matrix.scale m n
+*/
+int MatrixScaleCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
+                       int argc) {
+  if (argc != 3) {
+    return RedisModule_WrongArity(ctx);
+  }
+  RedisModule_AutoMemory(ctx);
+
+  Matrix *m;
+  double n;
+  RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
+  int type = RedisModule_KeyType(key);
+  if (type == REDISMODULE_KEYTYPE_EMPTY ||
+      RedisModule_ModuleTypeGetType(key) != MatrixType) {
+    return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+  }
+  m = RedisModule_ModuleTypeGetValue(key);
+  RMUtil_ParseArgs(argv, argc, 2, "d", &n);
+  MatrixScale(*m, n);
   RedisModule_ReplyWithSimpleString(ctx, "OK");
   return REDISMODULE_OK;
 }
@@ -426,13 +511,13 @@ int MatrixPrintCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   m = RedisModule_ModuleTypeGetValue(key);
 
   MatrixPrint(*m);
-  RedisModule_ReplyWithSimpleString(ctx, "PRINT_OK");
+  RedisModule_ReplyWithSimpleString(ctx, "OK");
   return REDISMODULE_OK;
 }
 
 int MatrixTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   MatrixTest();
-  RedisModule_ReplyWithSimpleString(ctx, "TEST_OK");
+  RedisModule_ReplyWithSimpleString(ctx, "OK");
   return REDISMODULE_OK;
 }
 
@@ -471,6 +556,8 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
 
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.set", MatrixSetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.multiply", MatrixMultiplyCommand);
+  RMUtil_RegisterWriteCmd(ctx, "ml.matrix.add", MatrixAddCommand);
+  RMUtil_RegisterWriteCmd(ctx, "ml.matrix.scale", MatrixScaleCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 

@@ -26,8 +26,15 @@ void MatrixPrint(Matrix m) {
   }
 }
 
-void MatrixAdd(Matrix a, Matrix b, Matrix c);
-void MatrixScale(Matrix a, double n, Matrix c);
+void MatrixAdd(Matrix a, Matrix b, Matrix c) {
+  for (int i = 0; i < a.rows * a.cols; i++) {
+    c.values[i] = a.values[i] + b.values[i];
+  }
+}
+
+void MatrixScale(Matrix a, double n) {
+  cblas_dscal(a.rows * a.cols, n, a.values, 1);
+}
 
 void MatrixTest(void) {
   double *A, *B, *C;
