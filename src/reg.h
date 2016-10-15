@@ -15,6 +15,7 @@ typedef struct {
 } LinReg;
 
 double LinRegPredict(double *features, LinReg *);
+double LogRegPredict(double *features, LinReg *);
 
 #endif  // __REG_H__
 

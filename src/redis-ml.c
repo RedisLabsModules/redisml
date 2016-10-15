@@ -316,6 +316,36 @@ int LinRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   return REDISMODULE_OK;
 }
 
+/*Predict value for a set of features
+* ml.logreg.predict <id> <features ...>
+*/
+int LogRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
+                         int argc) {
+  if (argc < 3) {
+    return RedisModule_WrongArity(ctx);
+  }
+  RedisModule_AutoMemory(ctx);
+
+  LinReg *lr;
+  RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
+  int type = RedisModule_KeyType(key);
+  if (type == REDISMODULE_KEYTYPE_EMPTY ||
+      RedisModule_ModuleTypeGetType(key) != LinRegType) {
+    return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+  }
+  lr = RedisModule_ModuleTypeGetValue(key);
+
+  double *features = malloc(lr->clen * sizeof(double));
+  int argIdx = 2;
+  while (argIdx < argc) {
+    RMUtil_ParseArgs(argv, argc, argIdx, "d", &features[argIdx - 2]);
+    argIdx++;
+  }
+  double rep = LogRegPredict(features, lr);
+  RedisModule_ReplyWithDouble(ctx, rep);
+  return REDISMODULE_OK;
+}
+
 // MATRIX Section:
 
 void *MatrixTypeRdbLoad(RedisModuleIO *io, int encver) {
@@ -547,6 +577,8 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
 
   RMUtil_RegisterWriteCmd(ctx, "ml.linreg.set", LinRegSetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.linreg.predict", LinRegPredictCommand);
+  RMUtil_RegisterWriteCmd(ctx, "ml.logreg.set", LinRegSetCommand);
+  RMUtil_RegisterWriteCmd(ctx, "ml.logreg.predict", LogRegPredictCommand);
 
   // Register MATRIX data type and functions
   MatrixType = RedisModule_CreateDataType(
