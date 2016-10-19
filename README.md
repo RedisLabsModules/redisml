@@ -17,20 +17,36 @@ Redis-ML is a turn key solution for using trained models in a production environ
 * Logistic regression.
 * Matrix operations.
 
-  ​
+
+
+
+## Requirements:
+
+[Redis](https://github.com/antirez/redis) build from unstable branch.
+
+Any [BLAS](http://www.netlib.org/blas/) library. I use [ATLAS](http://math-atlas.sourceforge.net/).
+
+To install ATLAS:
+
+- Ubuntu: `sudo apt-get install libatlas-base-dev`
+- CentOS/RHEL/Fedora: `sudo yum install atlas-devel`
+
+
 
 ## Building and running:
 
 ```sh
 git clone https://github.com/RedisLabsModules/redis-ml.git
-cd redis-ml/src
+cd redis-ml/src/rmutil
 make 
+cd ..
+make 
+
+#run redis server with the module
+redis-server --loadmodule ./redis-ml.so
 ```
 
-## Assuming you have a redis build from the unstable branch:
-```
-/path/to/redis-server --loadmodule ./redis-ml.so
-```
+
 
 ## Commands:
 

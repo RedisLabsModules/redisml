@@ -616,7 +616,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 
-  LOGGING_INIT(L_DEBUG);
+  LOGGING_INIT(L_WARN);
   LG_DEBUG("module loaded ok.");
   return REDISMODULE_OK;
 }
