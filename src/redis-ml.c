@@ -361,8 +361,8 @@ void MatrixTypeDigest(RedisModuleDigest *digest, void *value) {}
 void MatrixTypeFree(void *value) {}
 
 /*
- * Create / Override a linear regression model
- * ml.linreg.load <Id> <intercept> <coefficients ...>
+ * Create / Override a matrix
+ * ml.matrix.set <Id> <intercept> <coefficients ...>
  */
 int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   if (argc < 4) {
@@ -388,6 +388,9 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   }
   RMUtil_ParseArgs(argv, argc, 2, "ll", &(m->rows), &(m->cols));
   LG_DEBUG("rows: %lld, cols: %lld\n", m->rows, m->cols);
+  if (m->rows <= 0 || m->cols <= 0) {
+    return RedisModule_ReplyWithError(ctx, REDIS_ML_ERROR_GENERIC);
+  }
   m->values = malloc(m->cols * m->rows * sizeof(double));
   int argIdx = 4;
   while (argIdx < argc) {
@@ -425,6 +428,10 @@ int MatrixMultiplyCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
   }
   b = RedisModule_ModuleTypeGetValue(key);
+
+  if (b->rows != a->cols) {
+    return RedisModule_ReplyWithError(ctx, REDIS_ML_ERROR_GENERIC);
+  }
 
   key = RedisModule_OpenKey(ctx, argv[3], REDISMODULE_READ | REDISMODULE_WRITE);
   type = RedisModule_KeyType(key);
