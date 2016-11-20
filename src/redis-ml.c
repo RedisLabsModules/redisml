@@ -9,69 +9,15 @@
 #include "reader.h"
 #include "tree.h"
 #include "reg.h"
-#include "matrix.h"
+#include "matrix-type.h"
+#include "forest-type.h"
+#include "regression-type.h"
 #include "rmalloc.h"
 
-#define FORESTTYPE_ENCODING_VERSION 0
-#define FORESTTYPE_NAME "FOREST"
 #define RLMODULE_NAME "REDIS-ML"
 #define RLMODULE_VERSION "1.0.0"
 
-#define LINREGTYPE_ENCODING_VERSION 0
-#define LINREGTYPE_NAME "LINREG"
-
-#define MATRIXTYPE_ENCODING_VERSION 0
-#define MATRIXTYPE_NAME "MATRIX"
-
 #define REDIS_ML_ERROR_GENERIC "ERR Generic"
-
-static RedisModuleType *ForestType;
-static RedisModuleType *LinRegType;
-static RedisModuleType *MatrixType;
-
-void *ForestTypeRdbLoad(RedisModuleIO *io, int encver) {
-  if (encver != FORESTTYPE_ENCODING_VERSION) {
-    return NULL;
-  }
-  Forest *f;
-  f = malloc(sizeof(*f));
-  f->len = RedisModule_LoadUnsigned(io);
-  f->Trees = malloc(f->len * sizeof(Tree *));
-
-  for (int i = 0; i < f->len; i++) {
-    Tree *t = malloc(sizeof(Tree));
-    f->Trees[i] = t;
-    size_t tlen;
-    char *s = RedisModule_LoadStringBuffer(io, &tlen);
-    TreeDeSerialize(s, &t->root, tlen);
-  }
-  return f;
-}
-
-void ForestTypeRdbSave(RedisModuleIO *io, void *ptr) {
-  Forest *f = ptr;
-  RedisModule_SaveUnsigned(io, f->len);
-  for (int i = 0; i < f->len; i++) {
-    char path = 0;
-    char *s = NULL;
-    int len = TreeSerialize(&s, f->Trees[i]->root, &path, 0, 0);
-    RedisModule_SaveStringBuffer(io, s, len);
-    free(s);
-  }
-}
-
-void ForestTypeAofRewrite(RedisModuleIO *aof, RedisModuleString *key,
-                          void *value) {}
-
-void ForestTypeDigest(RedisModuleDigest *digest, void *value) {}
-
-void ForestTypeFree(void *value) {
-  Forest *f = value;
-  for (int i = 0; i < f->len; i++) {
-    TreeDel(f->Trees[i]->root);
-  }
-  free(f);
-}
 
 int ForestTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   TreeTest();
@@ -226,22 +172,6 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
 // LINREG Section:
 
-void *LinRegTypeRdbLoad(RedisModuleIO *io, int encver) {
-  if (encver != LINREGTYPE_ENCODING_VERSION) {
-    return NULL;
-  }
-  return NULL;
-}
-
-void LinRegTypeRdbSave(RedisModuleIO *io, void *ptr) {}
-
-void LinRegTypeAofRewrite(RedisModuleIO *aof, RedisModuleString *key,
-                          void *value) {}
-
-void LinRegTypeDigest(RedisModuleDigest *digest, void *value) {}
-
-void LinRegTypeFree(void *value) {}
-
 /*
  * Create / Override a linear regression model
  * ml.linreg.load <Id> <intercept> <coefficients ...>
@@ -259,14 +189,14 @@ int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
   int type = RedisModule_KeyType(key);
   if (type != REDISMODULE_KEYTYPE_EMPTY &&
-      RedisModule_ModuleTypeGetType(key) != LinRegType) {
+      RedisModule_ModuleTypeGetType(key) != RegressionType) {
     return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
   }
 
   LinReg *lr;
   if (type == REDISMODULE_KEYTYPE_EMPTY) {
     lr = malloc(sizeof(LinReg));
-    RedisModule_ModuleTypeSetValue(key, LinRegType, lr);
+    RedisModule_ModuleTypeSetValue(key, RegressionType, lr);
   } else {
     lr = RedisModule_ModuleTypeGetValue(key);
   }
@@ -296,7 +226,7 @@ int LinRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
   int type = RedisModule_KeyType(key);
   if (type == REDISMODULE_KEYTYPE_EMPTY ||
-      RedisModule_ModuleTypeGetType(key) != LinRegType) {
+      RedisModule_ModuleTypeGetType(key) != RegressionType) {
     return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
   }
   lr = RedisModule_ModuleTypeGetValue(key);
@@ -326,7 +256,7 @@ int LogRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
   int type = RedisModule_KeyType(key);
   if (type == REDISMODULE_KEYTYPE_EMPTY ||
-      RedisModule_ModuleTypeGetType(key) != LinRegType) {
+      RedisModule_ModuleTypeGetType(key) != RegressionType) {
     return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
   }
   lr = RedisModule_ModuleTypeGetValue(key);
@@ -343,22 +273,6 @@ int LogRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
 }
 
 // MATRIX Section:
-
-void *MatrixTypeRdbLoad(RedisModuleIO *io, int encver) {
-  if (encver != MATRIXTYPE_ENCODING_VERSION) {
-    return NULL;
-  }
-  return NULL;
-}
-
-void MatrixTypeRdbSave(RedisModuleIO *io, void *ptr) {}
-
-void MatrixTypeAofRewrite(RedisModuleIO *aof, RedisModuleString *key,
-                          void *value) {}
-
-void MatrixTypeDigest(RedisModuleDigest *digest, void *value) {}
-
-void MatrixTypeFree(void *value) {}
 
 /*
  * Create / Override a matrix
@@ -589,31 +503,22 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
   }
 
   // Register Forest data type and functions
-  ForestType = RedisModule_CreateDataType(
-      ctx, FORESTTYPE_NAME, FORESTTYPE_ENCODING_VERSION, ForestTypeRdbLoad,
-      ForestTypeRdbSave, ForestTypeAofRewrite, ForestTypeDigest,
-      ForestTypeFree);
+  ForestTypeRegister(ctx);
 
   RMUtil_RegisterWriteCmd(ctx, "ml.forest.add", ForestAddCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.forest.run", ForestRunCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.forest.test", ForestTestCommand);
 
-  // Register LINREG data type and functions
-  LinRegType = RedisModule_CreateDataType(
-      ctx, LINREGTYPE_NAME, LINREGTYPE_ENCODING_VERSION, LinRegTypeRdbLoad,
-      LinRegTypeRdbSave, LinRegTypeAofRewrite, LinRegTypeDigest,
-      LinRegTypeFree);
+  // Register LINREG data type and commands
+  RegressionTypeRegister(ctx);
 
   RMUtil_RegisterWriteCmd(ctx, "ml.linreg.set", LinRegSetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.linreg.predict", LinRegPredictCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.logreg.set", LinRegSetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.logreg.predict", LogRegPredictCommand);
 
-  // Register MATRIX data type and functions
-  MatrixType = RedisModule_CreateDataType(
-      ctx, MATRIXTYPE_NAME, MATRIXTYPE_ENCODING_VERSION, MatrixTypeRdbLoad,
-      MatrixTypeRdbSave, MatrixTypeAofRewrite, MatrixTypeDigest,
-      MatrixTypeFree);
+  // Register MATRIX data type and commands
+  MatrixTypeRegister(ctx);
 
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.set", MatrixSetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.get", MatrixGetCommand);
