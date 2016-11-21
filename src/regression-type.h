@@ -17,4 +17,4 @@ void RegressionTypeFree(void *value);
 
 int RegressionTypeRegister(RedisModuleCtx *ctx);
 
-#endif  // __REGRESSION-TYPE_H__
+#endif /*__REGRESSION-TYPE_H__*/

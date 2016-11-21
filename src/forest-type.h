@@ -17,4 +17,4 @@ void ForestTypeFree(void *value);
 
 int ForestTypeRegister(RedisModuleCtx *ctx);
 
-#endif  // __FOREST-TYPE_H__
+#endif /*__FOREST-TYPE_H__*/
