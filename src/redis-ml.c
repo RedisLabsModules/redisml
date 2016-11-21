@@ -19,18 +19,20 @@
 
 #define REDIS_ML_ERROR_GENERIC "ERR Generic"
 
+/*================ Forest Commands ================*/
+
 int ForestTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   TreeTest();
   RedisModule_ReplyWithSimpleString(ctx, "TEST_OK");
   return REDISMODULE_OK;
 }
 
-// 2D array comperator for the qsort
+/*2D array comperator for the qsort*/
 static int cmp2D(const void *p1, const void *p2) {
   return (int)(((const double *)p2)[1] - ((const double *)p1)[1]);
 }
 
-// ml.forest.run <forest> <data_item> [CLASSIFICATION|REGRESSION]
+/*ml.forest.run <forest> <data_item> [CLASSIFICATION|REGRESSION]*/
 int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   if (argc < 3) {
     return RedisModule_WrongArity(ctx);
@@ -170,7 +172,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   return REDISMODULE_OK;
 }
 
-// LINREG Section:
+/*================ Linear regression commands ================*/
 
 /*
  * Create / Override a linear regression model
@@ -212,7 +214,7 @@ int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   return REDISMODULE_OK;
 }
 
-/*Predict value for a set of features
+/*Run linear regression for a feature vector
 * ml.linreg.predict <id> <features ...>
 */
 int LinRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
@@ -241,6 +243,8 @@ int LinRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   RedisModule_ReplyWithDouble(ctx, rep);
   return REDISMODULE_OK;
 }
+
+/*================ Logistic regression commands ================*/
 
 /*Predict value for a set of features
 * ml.logreg.predict <id> <features ...>
@@ -272,11 +276,11 @@ int LogRegPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
   return REDISMODULE_OK;
 }
 
-// MATRIX Section:
+/*================ MATRIX Commands ================*/
 
 /*
  * Create / Override a matrix
- * ml.matrix.set <Id> <intercept> <coefficients ...>
+ * ml.matrix.set <Id> <rows> <cols> <values ...>
  */
 int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   if (argc < 4) {
@@ -494,38 +498,38 @@ int MatrixTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   return REDISMODULE_OK;
 }
 
-// Initialize the module
+/*Initialize the module*/
 int RedisModule_OnLoad(RedisModuleCtx *ctx) {
-  // Register the module itself
+  /* Register the module itself*/
   if (RedisModule_Init(ctx, "redis-ml", 1, REDISMODULE_APIVER_1) ==
       REDISMODULE_ERR) {
     return REDISMODULE_ERR;
   }
 
-  // Register Forest data type and functions
-  ForestTypeRegister(ctx);
+  /* Register Forest data type and functions*/
+  if (ForestTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
 
   RMUtil_RegisterWriteCmd(ctx, "ml.forest.add", ForestAddCommand);
-  RMUtil_RegisterWriteCmd(ctx, "ml.forest.run", ForestRunCommand);
+  RMUtil_RegisterReadCmd(ctx, "ml.forest.run", ForestRunCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.forest.test", ForestTestCommand);
 
-  // Register LINREG data type and commands
-  RegressionTypeRegister(ctx);
+  /*Register LINREG data type and commands*/
+  if (RegressionTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
 
   RMUtil_RegisterWriteCmd(ctx, "ml.linreg.set", LinRegSetCommand);
-  RMUtil_RegisterWriteCmd(ctx, "ml.linreg.predict", LinRegPredictCommand);
+  RMUtil_RegisterReadCmd(ctx, "ml.linreg.predict", LinRegPredictCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.logreg.set", LinRegSetCommand);
-  RMUtil_RegisterWriteCmd(ctx, "ml.logreg.predict", LogRegPredictCommand);
+  RMUtil_RegisterReadCmd(ctx, "ml.logreg.predict", LogRegPredictCommand);
 
-  // Register MATRIX data type and commands
-  MatrixTypeRegister(ctx);
+  /*Register MATRIX data type and commands*/
+  if (MatrixTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
 
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.set", MatrixSetCommand);
-  RMUtil_RegisterWriteCmd(ctx, "ml.matrix.get", MatrixGetCommand);
+  RMUtil_RegisterReadCmd(ctx, "ml.matrix.get", MatrixGetCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.multiply", MatrixMultiplyCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.add", MatrixAddCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.scale", MatrixScaleCommand);
-  RMUtil_RegisterWriteCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
+  RMUtil_RegisterReadCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
   RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 
   LOGGING_INIT(L_WARN);
