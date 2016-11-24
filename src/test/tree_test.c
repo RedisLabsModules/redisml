@@ -6,14 +6,14 @@
 
 MU_TEST(add_node_ok) {
     Tree t = {.root = NULL};
-    __forest_Node *n = NewNumericalNode("1", 1.0);
+    __forest_Node *n = Forest_NewNumericalNode("1", 1.0);
     int rc = Forest_TreeAdd(&t.root, ".", n);
     mu_check(rc == FOREST_OK);
 }
 
 MU_TEST(add_node_wrong_path) {
     Tree t = {.root = NULL};
-    __forest_Node *n = NewNumericalNode("1", 1.0);
+    __forest_Node *n = Forest_NewNumericalNode("1", 1.0);
     int rc = Forest_TreeAdd(&t.root, ".r", n);
     mu_check(rc == FOREST_ERR);
 }

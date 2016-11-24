@@ -44,13 +44,11 @@ typedef struct {
     Tree **Trees;
 } Forest;
 
-__forest_Node *NewNode();
+__forest_Node *Forest_NewNumericalNode(char *splitterAttr, double splitterVal);
 
-__forest_Node *NewNumericalNode(char *splitterAttr, double splitterVal);
+__forest_Node *Forest_NewCategoricalNode(char *splitterAttr, char *splitterVal);
 
-__forest_Node *NewCategoricalNode(char *splitterAttr, char *splitterVal);
-
-__forest_Node *NewLeaf(double);
+__forest_Node *Forest_NewLeaf(double);
 
 int Forest_TreeAdd(__forest_Node **root, char *path, __forest_Node *n);
 

@@ -20,14 +20,14 @@ __forest_Node *__newNode(char *splitterAttr) {
     return n;
 }
 
-__forest_Node *NewNumericalNode(char *splitterAttr, double sv) {
+__forest_Node *Forest_NewNumericalNode(char *splitterAttr, double sv) {
     __forest_Node *n = __newNode(splitterAttr);
     n->splitterType = S_NUMERICAL;
     n->splitterVal.fval = sv;
     return n;
 }
 
-__forest_Node *NewCategoricalNode(char *splitterAttr, char *sv) {
+__forest_Node *Forest_NewCategoricalNode(char *splitterAttr, char *sv) {
     __forest_Node *n = __newNode(splitterAttr);
     n->splitterType = S_CATEGORICAL;
     n->splitterVal.strval = malloc(strlen(sv) + 1);
@@ -35,7 +35,7 @@ __forest_Node *NewCategoricalNode(char *splitterAttr, char *sv) {
     return n;
 }
 
-__forest_Node *NewLeaf(double predVal) {
+__forest_Node *Forest_NewLeaf(double predVal) {
     __forest_Node *n = __newNode(NULL);
     n->type = N_LEAF;
     n->predVal = predVal;
@@ -205,14 +205,14 @@ void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen) {
 
             if (splitterType == S_NUMERICAL) {
                 printf("numerical: %lf\n", *((double *) (s + pos)));
-                n = NewNumericalNode(splitterAttr, *((double *) (s + pos)));
+                n = Forest_NewNumericalNode(splitterAttr, *((double *) (s + pos)));
                 pos += sizeof(double);
             } else if (splitterType == S_CATEGORICAL) {
                 printf("categorical: %s\n", s + pos);
-                n = NewCategoricalNode(splitterAttr, s + pos);
+                n = Forest_NewCategoricalNode(splitterAttr, s + pos);
             }
         } else {
-            n = NewLeaf(predVal);
+            n = Forest_NewLeaf(predVal);
         }
         Forest_TreeAdd(root, path, n);
         printf("last pos: %d\n", pos);
@@ -247,16 +247,16 @@ double Forest_TreeClassify(FeatureVec *ir, __forest_Node *root) {
 
 void Forest_TreeTest() {
     Tree t = {.root = NULL};
-    __forest_Node *n1 = NewNumericalNode("1", 1.0);
-    __forest_Node *n2 = NewNumericalNode("2", 2.0);
-    __forest_Node *n3 = NewNumericalNode("3", 3.0);
-    __forest_Node *n4 = NewNumericalNode("4", 4.0);
+    __forest_Node *n1 = Forest_NewNumericalNode("1", 1.0);
+    __forest_Node *n2 = Forest_NewNumericalNode("2", 2.0);
+    __forest_Node *n3 = Forest_NewNumericalNode("3", 3.0);
+    __forest_Node *n4 = Forest_NewNumericalNode("4", 4.0);
 
-    __forest_Node *n5 = NewLeaf(5.0);
-    __forest_Node *n6 = NewLeaf(6.0);
-    __forest_Node *n7 = NewLeaf(7.0);
-    __forest_Node *n8 = NewLeaf(8.0);
-    __forest_Node *n9 = NewLeaf(9.0);
+    __forest_Node *n5 = Forest_NewLeaf(5.0);
+    __forest_Node *n6 = Forest_NewLeaf(6.0);
+    __forest_Node *n7 = Forest_NewLeaf(7.0);
+    __forest_Node *n8 = Forest_NewLeaf(8.0);
+    __forest_Node *n9 = Forest_NewLeaf(9.0);
 
     Forest_TreeAdd(&t.root, ".", n1);
     Forest_TreeAdd(&t.root, ".l", n2);

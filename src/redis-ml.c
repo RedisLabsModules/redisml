@@ -143,18 +143,18 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             char *splitterAttr;
             double splitterVal;
             RMUtil_ParseArgs(argv, argc, argIdx, "cd", &splitterAttr, &splitterVal);
-            n = NewNumericalNode(splitterAttr, splitterVal);
+            n = Forest_NewNumericalNode(splitterAttr, splitterVal);
             argIdx += 2;
         } else if (strncasecmp(type, "CATEGORIC", strlen(type)) == 0) {
             char *splitterAttr;
             char *splitterVal;
             RMUtil_ParseArgs(argv, argc, argIdx, "cc", &splitterAttr, &splitterVal);
-            n = NewCategoricalNode(splitterAttr, splitterVal);
+            n = Forest_NewCategoricalNode(splitterAttr, splitterVal);
             argIdx += 2;
         } else if (strncasecmp(type, "LEAF", strlen(type)) == 0) {
             double predVal;
             RMUtil_ParseArgs(argv, argc, argIdx, "d", &predVal);
-            n = NewLeaf(predVal);
+            n = Forest_NewLeaf(predVal);
             argIdx++;
         } else {
             return REDISMODULE_ERR;
