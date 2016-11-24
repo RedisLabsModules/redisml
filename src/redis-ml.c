@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 
 #include "redismodule.h"
 #include "rmutil/test_util.h"
@@ -109,6 +110,41 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
     }
 
+    int argIdx = 3;
+    char *path;
+    char *nodeType;
+
+    /* Check args */
+    while (argIdx < argc) {
+        RMUtil_ParseArgs(argv, argc, argIdx, "cc", &path, &nodeType);
+        argIdx += 2;
+
+        /* Check path and convert to lower case */
+        for (int i = 0; i < strlen(path); ++i) {
+            path[i] = tolower(path[i]);
+            if (path[i] != 'l' || path[i] != 'r');{
+                return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_PATH);
+            }
+        }
+
+        /* Check node type */
+        argIdx += 2;
+        if (strncasecmp(nodeType, "NUMERIC", strlen(nodeType)) == 0) {
+            argIdx += 2;
+            continue;
+        } else if (strncasecmp(nodeType, "CATEGORIC", strlen(nodeType)) == 0) {
+            argIdx += 2;
+            continue;
+        } else if (strncasecmp(nodeType, "LEAF", strlen(nodeType)) == 0) {
+            argIdx++;
+            continue;
+        } else {
+            return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
+        }
+    }
+
+
+
     Forest *f;
     if (type == REDISMODULE_KEYTYPE_EMPTY) {
         f = malloc(sizeof(Forest));
@@ -134,31 +170,29 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     }
 
     __forest_Node *n = NULL;
-    int argIdx = 3;
+    argIdx = 3;
     while (argIdx < argc) {
-        char *path;
-        char *type;
-        RMUtil_ParseArgs(argv, argc, argIdx, "cc", &path, &type);
+        RMUtil_ParseArgs(argv, argc, argIdx, "cc", &path, &nodeType);
         argIdx += 2;
-        if (strncasecmp(type, "NUMERIC", strlen(type)) == 0) {
+        if (strncasecmp(nodeType, "NUMERIC", strlen(nodeType)) == 0) {
             char *splitterAttr;
             double splitterVal;
             RMUtil_ParseArgs(argv, argc, argIdx, "cd", &splitterAttr, &splitterVal);
             n = Forest_NewNumericalNode(splitterAttr, splitterVal);
             argIdx += 2;
-        } else if (strncasecmp(type, "CATEGORIC", strlen(type)) == 0) {
+        } else if (strncasecmp(nodeType, "CATEGORIC", strlen(nodeType)) == 0) {
             char *splitterAttr;
             char *splitterVal;
             RMUtil_ParseArgs(argv, argc, argIdx, "cc", &splitterAttr, &splitterVal);
             n = Forest_NewCategoricalNode(splitterAttr, splitterVal);
             argIdx += 2;
-        } else if (strncasecmp(type, "LEAF", strlen(type)) == 0) {
+        } else if (strncasecmp(nodeType, "LEAF", strlen(nodeType)) == 0) {
             double predVal;
             RMUtil_ParseArgs(argv, argc, argIdx, "d", &predVal);
             n = Forest_NewLeaf(predVal);
             argIdx++;
         } else {
-            return REDISMODULE_ERR;
+            return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
         }
         int err = Forest_TreeAdd(&t->root, path, n);
         if (err != FOREST_OK) {
