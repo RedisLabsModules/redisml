@@ -9,17 +9,17 @@
 typedef struct {
     char *key;
     double value;
-} Field;
+} Feature;
 
 typedef struct {
     double Result;
-    Field *Fields;
+    Feature *Features;
     size_t len;
     double NumericFields[MAX_NUM_FIELDS];
-} InputRow;
+} FeatureVec;
 
-void ReadInput(char *file, InputRow **rows);
-int MakeInputRow(char *data, InputRow *ir);
-void PrintInputRow(InputRow *ir);
-double GetValue(InputRow *ir, char *key);
-#endif  // __READER_H__
+void ReadInput(char *file, FeatureVec **rows);
+int MakeFeatureVec(char *data, FeatureVec *ir);
+void PrintFeatureVec(FeatureVec *ir);
+double GetValue(FeatureVec *ir, char *key);
+#endif  /* __READER_H__ */

@@ -21,7 +21,7 @@ endif
 CFLAGS = -I$(RM_INCLUDE_DIR) -Wall -g -fPIC -lc -lm -lcblas -O2 -std=gnu99  
 CC=gcc
 
-OBJS=rmalloc.o tree.o forest-type.o reader.o reg.o regression-type.o matrix.o matrix-type.o util/logging.o
+OBJS=rmalloc.o tree.o forest-type.o feature-vec.o reg.o regression-type.o matrix.o matrix-type.o util/logging.o
 
 all: redis-ml.so  
 

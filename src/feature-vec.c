@@ -2,26 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "reader.h"
+#include "feature-vec.h"
 
-double GetValue(InputRow *ir, char *key) {
+double GetValue(FeatureVec *ir, char *key) {
   int nkey = (int)atof(key);
   if (nkey > 0 && nkey < MAX_NUM_FIELDS) {
     return ir->NumericFields[nkey];
   }
   printf("BUG!, nkey=%d, key=%s\n", nkey, key);
   for (int i = 0; i < ir->len; i++) {
-    if (strcmp(key, ir->Fields[i].key) == 0) {
-      return ir->Fields[i].value;
+    if (strcmp(key, ir->Features[i].key) == 0) {
+      return ir->Features[i].value;
     }
   }
   return 0;
 }
 
-void PrintInputRow(InputRow *ir) {
+void PrintFeatureVec(FeatureVec *ir) {
   printf("strings:\n");
   for (int i = 0; i < ir->len; i++) {
-    printf("key: %s, val: %lf\n", ir->Fields[i].key, ir->Fields[i].value);
+    printf("key: %s, val: %lf\n", ir->Features[i].key, ir->Features[i].value);
   }
 
   printf("numerics:\n");
@@ -32,7 +32,7 @@ void PrintInputRow(InputRow *ir) {
   }
 }
 
-int MakeInputRow(char *data, InputRow *ir) {
+int MakeFeatureVec(char *data, FeatureVec *ir) {
   char *start, *token, *saveptr = NULL, *subtoken1, *subtoken2,
                        *subsaveptr = NULL;
   int fieldIndex = 0;
@@ -44,14 +44,14 @@ int MakeInputRow(char *data, InputRow *ir) {
     if (subtoken1 == NULL || subtoken2 == NULL) {
       return 1;
     }
-    // try to add numeric field
+    /* try to add numeric field */
     int nkey = (int)atof(subtoken1);
     if (nkey > 0 && nkey < MAX_NUM_FIELDS) {
       ir->NumericFields[nkey] = atof(subtoken2);
     } else {
-      ir->Fields = realloc(ir->Fields, sizeof(Field) * (fieldIndex + 2));
-      ir->Fields[fieldIndex].key = strndup(subtoken1, strlen(subtoken1));
-      ir->Fields[fieldIndex].value = atof(subtoken2);
+      ir->Features = realloc(ir->Features, sizeof(Feature) * (fieldIndex + 2));
+      ir->Features[fieldIndex].key = strndup(subtoken1, strlen(subtoken1));
+      ir->Features[fieldIndex].value = atof(subtoken2);
       ir->len++;
       fieldIndex++;
     }
@@ -64,7 +64,7 @@ int MakeInputRow(char *data, InputRow *ir) {
   return 0;
 }
 
-void ReadInput(char *file, InputRow **rows) {
+void ReadInput(char *file, FeatureVec **rows) {
   FILE *fp;
   char *line = NULL;
   size_t len = 0;

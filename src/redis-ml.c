@@ -6,7 +6,7 @@
 #include "rmutil/test_util.h"
 #include "rmutil/util.h"
 #include "util/logging.h"
-#include "reader.h"
+#include "feature-vec.h"
 #include "tree.h"
 #include "reg.h"
 #include "matrix-type.h"
@@ -58,9 +58,9 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   }
   f = RedisModule_ModuleTypeGetValue(key);
 
-  Field *fields = NULL;
-  InputRow ir = {0, fields};
-  MakeInputRow(data, &ir);
+  Feature *features = NULL;
+  FeatureVec fv = {0, features};
+  MakeFeatureVec(data, &fv);
 
   double rep = 0;
   if (classification) {
@@ -69,7 +69,7 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     long class;
     long maxClass = 0;
     for (int i = 0; i < (int)f->len; i++) {
-      class = (long)TreeClassify(&ir, f->Trees[i]->root) % 1024;
+      class = (long)TreeClassify(&fv, f->Trees[i]->root) % 1024;
       results[class][0] = (double)class;
       results[class][1]++;
       if (class > maxClass) {
@@ -81,7 +81,7 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
   } else {
     LG_DEBUG("regression");
     for (int i = 0; i < (int)f->len; i++) {
-      rep += TreeClassify(&ir, f->Trees[i]->root);
+      rep += TreeClassify(&fv, f->Trees[i]->root);
     }
     rep /= (int)f->len;
   }

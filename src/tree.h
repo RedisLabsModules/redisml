@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "reader.h"
+#include "feature-vec.h"
 
 #define TREE_OK 0
 #define TREE_ERR 1
@@ -53,7 +53,7 @@ void TreeDel(Node *root);
 int TreeSerialize(char **dst, Node *root, char *path, int plen, int slen);
 void TreeDeSerialize(char *s, Node **root, int slen);
 
-double TreeClassify(InputRow *ir, Node *root);
+double TreeClassify(FeatureVec *ir, Node *root);
 void TreeTest();
 
 #endif  // __TREE_H__

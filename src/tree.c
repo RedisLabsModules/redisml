@@ -3,12 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "reader.h"
+#include "feature-vec.h"
 #include "tree.h"
 #include "util/logging.h"
 #include "rmalloc.h"
 
-Node *newNode(char *splitterAttr) {
+Node *__newNode(char *splitterAttr) {
   Node *n = (Node *)malloc(sizeof(Node));
   if (splitterAttr) {
     n->splitterAttr = malloc(strlen(splitterAttr) + 1);
@@ -22,14 +22,14 @@ Node *newNode(char *splitterAttr) {
 }
 
 Node *NewNumericalNode(char *splitterAttr, double sv) {
-  Node *n = newNode(splitterAttr);
+  Node *n = __newNode(splitterAttr);
   n->splitterType = S_NUMERICAL;
   n->splitterVal.fval = sv;
   return n;
 }
 
 Node *NewCategoricalNode(char *splitterAttr, char *sv) {
-  Node *n = newNode(splitterAttr);
+  Node *n = __newNode(splitterAttr);
   n->splitterType = S_CATEGORICAL;
   n->splitterVal.strval = malloc(strlen(sv) + 1);
   sprintf(n->splitterVal.strval, "%s", sv);
@@ -37,7 +37,7 @@ Node *NewCategoricalNode(char *splitterAttr, char *sv) {
 }
 
 Node *NewLeaf(double predVal) {
-  Node *n = newNode(NULL);
+  Node *n = __newNode(NULL);
   n->type = N_LEAF;
   n->predVal = predVal;
   return n;
@@ -233,7 +233,7 @@ void TreeDel(Node *root) {
   }
 }
 
-double TreeClassify(InputRow *ir, Node *root) {
+double TreeClassify(FeatureVec *ir, Node *root) {
   if (root == NULL) {
     printf("TreeClassify reached NULL node\n");
     return 0;

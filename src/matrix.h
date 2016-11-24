@@ -19,6 +19,7 @@ void MatrixAdd(Matrix a, Matrix b, Matrix c);
 void MatrixScale(Matrix a, double n);
 void MatrixPrint(Matrix m);
 void MatrixTest(void);
-#endif  // __MATRIX_H__
 
-//
+#endif  /* __MATRIX_H__ */
+
+

@@ -2,27 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../reader.h"
+#include "../feature-vec.h"
 #include "minunit.h"
 
 MU_TEST(input_ok) {
-  Field *irFields = NULL;
-  InputRow testIR = {0, irFields};
-  int ret = MakeInputRow("1:0.2,3:4,5:6,7:8", &testIR);
+  Feature *irFields = NULL;
+  FeatureVec testIR = {0, irFields};
+  int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:8", &testIR);
   mu_check(ret == 0);
 }
 
 MU_TEST(missing_val) {
-  Field *irFields = NULL;
-  InputRow testIR = {0, irFields};
-  int ret = MakeInputRow("1:0.2,3:4,5:6,7:", &testIR);
+  Feature *irFields = NULL;
+  FeatureVec testIR = {0, irFields};
+  int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:", &testIR);
   mu_check(ret == 1);
 }
 
 MU_TEST(all_wrong) {
-  Field *irFields = NULL;
-  InputRow testIR = {0, irFields};
-  int ret = MakeInputRow("1", &testIR);
+  Feature *irFields = NULL;
+  FeatureVec testIR = {0, irFields};
+  int ret = MakeFeatureVec("1", &testIR);
   mu_check(ret == 1);
 }
 
