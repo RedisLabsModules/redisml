@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 if pgrep redis-server > /dev/null
 then

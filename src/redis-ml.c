@@ -58,7 +58,7 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     Feature *features = NULL;
     FeatureVec fv = {0, features};
-    if(FeatureVec_Create(data, &fv) != 0){
+    if (FeatureVec_Create(data, &fv) != 0) {
         return RedisModule_ReplyWithError(ctx, REDIS_ML_FV_ERROR_BAD_FORMAT);
     }
 
@@ -124,7 +124,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         /* Check path and convert to lower case */
         for (int i = 1; i < strlen(path); ++i) {
             path[i] = tolower(path[i]);
-            if (!(path[i] == 'l' || path[i] == 'r')){
+            if (!(path[i] == 'l' || path[i] == 'r')) {
                 return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_PATH);
             }
         }
@@ -226,15 +226,16 @@ int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
     }
 
-    LinReg *lr;
+    LinReg *lr = NULL;
     if (type == REDISMODULE_KEYTYPE_EMPTY) {
         lr = malloc(sizeof(LinReg));
+        lr->coefficients = NULL;
         RedisModule_ModuleTypeSetValue(key, RegressionType, lr);
     } else {
         lr = RedisModule_ModuleTypeGetValue(key);
     }
     lr->clen = argc - 2;
-    lr->coefficients = malloc(lr->clen * sizeof(double));
+    lr->coefficients = realloc(lr->coefficients, lr->clen * sizeof(double));
     RMUtil_ParseArgs(argv, argc, 2, "d", &lr->intercept);
     int argIdx = 3;
     while (argIdx < argc) {
@@ -331,6 +332,7 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     Matrix *m;
     if (type == REDISMODULE_KEYTYPE_EMPTY) {
         m = malloc(sizeof(Matrix));
+        m->values = NULL;
         RedisModule_ModuleTypeSetValue(key, MatrixType, m);
     } else {
         m = RedisModule_ModuleTypeGetValue(key);
@@ -338,9 +340,9 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     RMUtil_ParseArgs(argv, argc, 2, "ll", &(m->rows), &(m->cols));
     LG_DEBUG("rows: %lld, cols: %lld\n", m->rows, m->cols);
     if (m->rows <= 0 || m->cols <= 0) {
-        return RedisModule_ReplyWithError(ctx, REDIS_ML_ERROR_GENERIC);
+        return RedisModule_ReplyWithError(ctx, REDIS_ML_MATRIX_SET_BAD_DIMENTIONS);
     }
-    m->values = malloc(m->cols * m->rows * sizeof(double));
+    m->values = realloc(m->values, m->cols * m->rows * sizeof(double));
     int argIdx = 4;
     while (argIdx < argc) {
         RMUtil_ParseArgs(argv, argc, argIdx, "d", &m->values[argIdx - 4]);
@@ -350,7 +352,7 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     return REDISMODULE_OK;
 }
 
-/*Multiply matrices a*b=c. a and b are existng keys and c should be new /
+/*Multiply matrices a*b=c. a and b are existing keys and c should be new or
 * overwritten
 * ml.matrix.multiply a b c
 */
@@ -379,7 +381,7 @@ int MatrixMultiplyCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     b = RedisModule_ModuleTypeGetValue(key);
 
     if (b->rows != a->cols) {
-        return RedisModule_ReplyWithError(ctx, REDIS_ML_ERROR_GENERIC);
+        return RedisModule_ReplyWithError(ctx, REDIS_ML_MATRIX_MUL_BAD_DIMENTIONS);
     }
 
     key = RedisModule_OpenKey(ctx, argv[3], REDISMODULE_READ | REDISMODULE_WRITE);
@@ -431,6 +433,10 @@ int MatrixAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     }
     b = RedisModule_ModuleTypeGetValue(key);
 
+    if (b->rows != a->rows || b->cols != a->cols) {
+        return RedisModule_ReplyWithError(ctx, REDIS_ML_MATRIX_ADD_BAD_DIMENTIONS);
+    }
+
     key = RedisModule_OpenKey(ctx, argv[3], REDISMODULE_READ | REDISMODULE_WRITE);
     type = RedisModule_KeyType(key);
     if (type != REDISMODULE_KEYTYPE_EMPTY &&
@@ -440,13 +446,14 @@ int MatrixAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     if (type == REDISMODULE_KEYTYPE_EMPTY) {
         c = malloc(sizeof(Matrix));
+        c->values = NULL;
         RedisModule_ModuleTypeSetValue(key, MatrixType, c);
     } else {
         c = RedisModule_ModuleTypeGetValue(key);
     }
     c->rows = a->rows;
     c->cols = b->cols;
-    c->values = malloc(c->cols * c->rows * sizeof(double));
+    c->values = realloc(c->values, c->cols * c->rows * sizeof(double));
     Matrix_Add(*a, *b, *c);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
