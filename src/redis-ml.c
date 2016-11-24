@@ -9,6 +9,7 @@
 #include "matrix-type.h"
 #include "forest-type.h"
 #include "regression-type.h"
+#include "matrix.h"
 
 #define RLMODULE_NAME "REDIS-ML"
 #define RLMODULE_VERSION "1.0.0"
@@ -356,13 +357,14 @@ int MatrixMultiplyCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
 
     if (type == REDISMODULE_KEYTYPE_EMPTY) {
         c = malloc(sizeof(Matrix));
+        c->values = NULL;
         RedisModule_ModuleTypeSetValue(key, MatrixType, c);
     } else {
         c = RedisModule_ModuleTypeGetValue(key);
     }
     c->rows = a->rows;
     c->cols = b->cols;
-    c->values = malloc(c->cols * c->rows * sizeof(double));
+    c->values = realloc(c->values, c->cols * c->rows * sizeof(double));
     Matrix_Multiply(*a, *b, *c);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;

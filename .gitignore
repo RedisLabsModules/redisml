@@ -12,4 +12,5 @@ src/nbproject/
 src/test/feature-vec_test                                                                                                                                                  
 src/test/test_matrix                                                                                                                                                       
 src/test/tree_test  
-src/test/data/rand_data  
+src/test/data/rand_data
+src/rmutil/test_vector

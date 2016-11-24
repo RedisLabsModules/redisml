@@ -25,8 +25,11 @@ OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matr
 
 all: redis-ml.so  
 
-redis-ml.so: redis-ml.o $(OBJS)
+redis-ml.so: rmutil/librmutil.a redis-ml.o $(OBJS)
 	$(LD) -o $@ redis-ml.o $(OBJS) $(SHOBJ_LDFLAGS) $(LIBS) -L$(RMUTIL_LIBDIR) -lrmutil -lc -lcblas
+
+rmutil/librmutil.a:
+	echo "making rmutil" && cd rmutil && $(MAKE) all
 
 clean:
 	rm -rf *.xo *.so *.o
