@@ -1,3 +1,13 @@
+
+if pgrep redis-server > /dev/null
+then
+    echo "Trying with running Redis"
+else
+    echo "Starting Redis"
+    redis-server --loadmodule ../redis-ml.so &
+    sleep 1
+fi
+
 for i in {0..5}
 do
   redis-cli ml.forest.add f1 $i . numeric 1 0.1 .l leaf 1 .r leaf 0
@@ -29,3 +39,4 @@ done
 echo run:
 redis-cli ml.forest.run "f1" "a:2,b:4,1:0.01"
 
+pkill redis-server

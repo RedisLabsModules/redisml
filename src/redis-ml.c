@@ -120,15 +120,14 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         argIdx += 2;
 
         /* Check path and convert to lower case */
-        for (int i = 0; i < strlen(path); ++i) {
+        for (int i = 1; i < strlen(path); ++i) {
             path[i] = tolower(path[i]);
-            if (path[i] != 'l' || path[i] != 'r');{
+            if (!(path[i] == 'l' || path[i] == 'r')){
                 return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_PATH);
             }
         }
 
         /* Check node type */
-        argIdx += 2;
         if (strncasecmp(nodeType, "NUMERIC", strlen(nodeType)) == 0) {
             argIdx += 2;
             continue;
@@ -142,8 +141,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
         }
     }
-
-
+    LG_DEBUG("params ok");
 
     Forest *f;
     if (type == REDISMODULE_KEYTYPE_EMPTY) {
