@@ -9,12 +9,13 @@
 #define REG_ERR 1
 
 typedef struct {
-  double intercept;
-  double *coefficients;
-  int clen;
+    double intercept;
+    double *coefficients;
+    int clen;
 } LinReg;
 
 double LinRegPredict(double *features, LinReg *);
+
 double LogRegPredict(double *features, LinReg *);
 
 #endif  // __REG_H__

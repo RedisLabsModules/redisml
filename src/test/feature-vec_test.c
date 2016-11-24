@@ -1,40 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "../feature-vec.h"
 #include "minunit.h"
 
 MU_TEST(input_ok) {
-  Feature *irFields = NULL;
-  FeatureVec testIR = {0, irFields};
-  int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:8", &testIR);
-  mu_check(ret == 0);
+    Feature *irFields = NULL;
+    FeatureVec testIR = {0, irFields};
+    int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:8", &testIR);
+    mu_check(ret == 0);
 }
 
 MU_TEST(missing_val) {
-  Feature *irFields = NULL;
-  FeatureVec testIR = {0, irFields};
-  int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:", &testIR);
-  mu_check(ret == 1);
+    Feature *irFields = NULL;
+    FeatureVec testIR = {0, irFields};
+    int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:", &testIR);
+    mu_check(ret == 1);
 }
 
 MU_TEST(all_wrong) {
-  Feature *irFields = NULL;
-  FeatureVec testIR = {0, irFields};
-  int ret = MakeFeatureVec("1", &testIR);
-  mu_check(ret == 1);
+    Feature *irFields = NULL;
+    FeatureVec testIR = {0, irFields};
+    int ret = MakeFeatureVec("1", &testIR);
+    mu_check(ret == 1);
 }
 
 MU_TEST_SUITE(test_suite) {
-  MU_RUN_TEST(input_ok);
-  MU_RUN_TEST(missing_val);
-  MU_RUN_TEST(all_wrong);
+    MU_RUN_TEST(input_ok);
+    MU_RUN_TEST(missing_val);
+    MU_RUN_TEST(all_wrong);
 }
 
 int main(int argc, char **argv) {
-  printf("Testing reader\n");
-  MU_RUN_SUITE(test_suite);
-  MU_REPORT();
-  exit(EXIT_SUCCESS);
+    printf("Testing reader\n");
+    MU_RUN_SUITE(test_suite);
+    MU_REPORT();
+    exit(EXIT_SUCCESS);
 }

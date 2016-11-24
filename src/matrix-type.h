@@ -10,9 +10,13 @@
 extern RedisModuleType *MatrixType;
 
 void *MatrixTypeRdbLoad(RedisModuleIO *, int);
+
 void MatrixTypeRdbSave(RedisModuleIO *, void *);
+
 void MatrixTypeAofRewrite(RedisModuleIO *, RedisModuleString *, void *);
+
 void MatrixTypeDigest(RedisModuleDigest *, void *);
+
 void MatrixTypeFree(void *value);
 
 int MatrixTypeRegister(RedisModuleCtx *ctx);

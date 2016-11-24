@@ -19,7 +19,11 @@ typedef struct {
 } FeatureVec;
 
 void ReadInput(char *file, FeatureVec **rows);
+
 int MakeFeatureVec(char *data, FeatureVec *ir);
+
 void PrintFeatureVec(FeatureVec *ir);
+
 double GetValue(FeatureVec *ir, char *key);
+
 #endif  /* __READER_H__ */

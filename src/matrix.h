@@ -9,15 +9,19 @@
 #define MATRIX_ERR 1
 
 typedef struct {
-  long long int rows;
-  long long int cols;
-  double *values;
+    long long int rows;
+    long long int cols;
+    double *values;
 } Matrix;
 
 void MatrixMultiply(Matrix a, Matrix b, Matrix c);
+
 void MatrixAdd(Matrix a, Matrix b, Matrix c);
+
 void MatrixScale(Matrix a, double n);
+
 void MatrixPrint(Matrix m);
+
 void MatrixTest(void);
 
 #endif  /* __MATRIX_H__ */

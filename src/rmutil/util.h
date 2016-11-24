@@ -66,14 +66,14 @@ int rmutil_vparseArgs(RedisModuleString **argv, int argc, int offset,
 
 // A single key/value entry in a redis info map
 typedef struct {
-  const char *key;
-  const char *val;
+    const char *key;
+    const char *val;
 } RMUtilInfoEntry;
 
 // Representation of INFO command response, as a list of k/v pairs
 typedef struct {
-  RMUtilInfoEntry *entries;
-  int numEntries;
+    RMUtilInfoEntry *entries;
+    int numEntries;
 } RMUtilInfo;
 
 /**
@@ -113,6 +113,6 @@ int RMUtilInfo_GetDouble(RMUtilInfo *info, const char *key, double *d);
 * element from an array (or NULL if not found)
 */
 RedisModuleCallReply *RedisModule_CallReplyArrayElementByPath(
-    RedisModuleCallReply *rep, const char *path);
+        RedisModuleCallReply *rep, const char *path);
 
 #endif

@@ -1,5 +1,4 @@
 #include "vector.h"
-#include <stdio.h>
 
 inline int __vector_PushPtr(Vector *v, void *elem) {
     if (v->top == v->cap) {

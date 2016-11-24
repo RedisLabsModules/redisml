@@ -10,9 +10,13 @@
 extern RedisModuleType *RegressionType;
 
 void *RegressionTypeRdbLoad(RedisModuleIO *, int);
+
 void RegressionTypeRdbSave(RedisModuleIO *, void *);
+
 void RegressionTypeAofRewrite(RedisModuleIO *, RedisModuleString *, void *);
+
 void RegressionTypeDigest(RedisModuleDigest *, void *);
+
 void RegressionTypeFree(void *value);
 
 int RegressionTypeRegister(RedisModuleCtx *ctx);
