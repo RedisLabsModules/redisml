@@ -56,7 +56,7 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     Feature *features = NULL;
     FeatureVec fv = {0, features};
-    MakeFeatureVec(data, &fv);
+    FeatureVec_Create(data, &fv);
 
     double rep = 0;
     if (classification) {
@@ -363,7 +363,7 @@ int MatrixMultiplyCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     c->rows = a->rows;
     c->cols = b->cols;
     c->values = malloc(c->cols * c->rows * sizeof(double));
-    MatrixMultiply(*a, *b, *c);
+    Matrix_Multiply(*a, *b, *c);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
 }
@@ -411,7 +411,7 @@ int MatrixAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     c->rows = a->rows;
     c->cols = b->cols;
     c->values = malloc(c->cols * c->rows * sizeof(double));
-    MatrixAdd(*a, *b, *c);
+    Matrix_Add(*a, *b, *c);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
 }
@@ -436,7 +436,7 @@ int MatrixScaleCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     }
     m = RedisModule_ModuleTypeGetValue(key);
     RMUtil_ParseArgs(argv, argc, 2, "d", &n);
-    MatrixScale(*m, n);
+    Matrix_Scale(*m, n);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
 }
@@ -483,13 +483,13 @@ int MatrixPrintCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     }
     m = RedisModule_ModuleTypeGetValue(key);
 
-    MatrixPrint(*m);
+    Matrix_Print(*m);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
 }
 
 int MatrixTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-    MatrixTest();
+    Matrix_Test();
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
 }

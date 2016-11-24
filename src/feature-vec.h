@@ -18,12 +18,10 @@ typedef struct {
     double NumericFields[MAX_NUM_FIELDS];
 } FeatureVec;
 
-void ReadInput(char *file, FeatureVec **rows);
+int FeatureVec_Create(char *data, FeatureVec *ir);
 
-int MakeFeatureVec(char *data, FeatureVec *ir);
+void FeatureVec_Print(FeatureVec *ir);
 
-void PrintFeatureVec(FeatureVec *ir);
-
-double GetValue(FeatureVec *ir, char *key);
+double FeatureVec_GetValue(FeatureVec *ir, char *key);
 
 #endif  /* __READER_H__ */

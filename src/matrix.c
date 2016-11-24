@@ -3,17 +3,18 @@
 #include <cblas.h>
 #include "matrix.h"
 
-void MatrixMultiply(Matrix a, Matrix b, Matrix c) {
-    // for dimentions:
-    // a[m*k],b[k*n],c[m*n]
-    // We use:
-    // RowMajor, NoTrans, NoTrans, m, n, k, 1, A, k, B, n, 0, C, n);
-    //
+void Matrix_Multiply(Matrix a, Matrix b, Matrix c) {
+    /* for dimentions:
+     * a[m*k],b[k*n],c[m*n]
+     * We use:
+     * RowMajor, NoTrans, NoTrans, m, n, k, 1, A, k, B, n, 0, C, n);
+     */
+
     cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, a.rows, b.cols, a.cols,
                 1, a.values, a.cols, b.values, b.cols, 0, c.values, b.cols);
 }
 
-void MatrixPrint(Matrix m) {
+void Matrix_Print(Matrix m) {
     printf("=====\n");
     printf("rows: %lld, columns: %lld\n", m.rows, m.cols);
     for (int i = 0; i < m.rows; i++) {
@@ -24,17 +25,17 @@ void MatrixPrint(Matrix m) {
     }
 }
 
-void MatrixAdd(Matrix a, Matrix b, Matrix c) {
+void Matrix_Add(Matrix a, Matrix b, Matrix c) {
     for (int i = 0; i < a.rows * a.cols; i++) {
         c.values[i] = a.values[i] + b.values[i];
     }
 }
 
-void MatrixScale(Matrix a, double n) {
+void Matrix_Scale(Matrix a, double n) {
     cblas_dscal(a.rows * a.cols, n, a.values, 1);
 }
 
-void MatrixTest(void) {
+void Matrix_Test(void) {
     double *A, *B, *C;
     int m, n, k, i;
     double alpha, beta;

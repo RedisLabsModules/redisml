@@ -238,7 +238,7 @@ double Forest_TreeClassify(FeatureVec *ir, __forest_Node *root) {
         return root->predVal;
     }
 
-    double attrVal = GetValue(ir, root->splitterAttr);
+    double attrVal = FeatureVec_GetValue(ir, root->splitterAttr);
     if (attrVal <= root->splitterVal.fval) {
         return Forest_TreeClassify(ir, root->left);
     }

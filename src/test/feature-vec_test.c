@@ -7,21 +7,21 @@
 MU_TEST(input_ok) {
     Feature *irFields = NULL;
     FeatureVec testIR = {0, irFields};
-    int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:8", &testIR);
+    int ret = FeatureVec_Create("1:0.2,3:4,5:6,7:8", &testIR);
     mu_check(ret == 0);
 }
 
 MU_TEST(missing_val) {
     Feature *irFields = NULL;
     FeatureVec testIR = {0, irFields};
-    int ret = MakeFeatureVec("1:0.2,3:4,5:6,7:", &testIR);
+    int ret = FeatureVec_Create("1:0.2,3:4,5:6,7:", &testIR);
     mu_check(ret == 1);
 }
 
 MU_TEST(all_wrong) {
     Feature *irFields = NULL;
     FeatureVec testIR = {0, irFields};
-    int ret = MakeFeatureVec("1", &testIR);
+    int ret = FeatureVec_Create("1", &testIR);
     mu_check(ret == 1);
 }
 

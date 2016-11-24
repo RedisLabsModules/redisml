@@ -4,12 +4,11 @@
 
 #include "feature-vec.h"
 
-double GetValue(FeatureVec *ir, char *key) {
+double FeatureVec_GetValue(FeatureVec *ir, char *key) {
     int nkey = (int) atof(key);
     if (nkey > 0 && nkey < MAX_NUM_FIELDS) {
         return ir->NumericFields[nkey];
     }
-    printf("BUG!, nkey=%d, key=%s\n", nkey, key);
     for (int i = 0; i < ir->len; i++) {
         if (strcmp(key, ir->Features[i].key) == 0) {
             return ir->Features[i].value;
@@ -18,7 +17,7 @@ double GetValue(FeatureVec *ir, char *key) {
     return 0;
 }
 
-void PrintFeatureVec(FeatureVec *ir) {
+void FeatureVec_Print(FeatureVec *ir) {
     printf("strings:\n");
     for (int i = 0; i < ir->len; i++) {
         printf("key: %s, val: %lf\n", ir->Features[i].key, ir->Features[i].value);
@@ -32,7 +31,7 @@ void PrintFeatureVec(FeatureVec *ir) {
     }
 }
 
-int MakeFeatureVec(char *data, FeatureVec *ir) {
+int FeatureVec_Create(char *data, FeatureVec *ir) {
     char *start, *token, *saveptr = NULL, *subtoken1, *subtoken2,
             *subsaveptr = NULL;
     int fieldIndex = 0;
@@ -64,36 +63,3 @@ int MakeFeatureVec(char *data, FeatureVec *ir) {
     return 0;
 }
 
-void ReadInput(char *file, FeatureVec **rows) {
-    FILE *fp;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    char *token, *subtoken, *saveptr, *subsaveptr;
-    int id, val;
-
-    fp = fopen(file, "r");
-    if (fp == NULL) exit(EXIT_FAILURE);
-
-    read = getline(&line, &len, fp);
-    printf("Retrieved line of length %zu :\n", read);
-    printf("%s", line);
-
-    token = strtok_r(line, " ", &saveptr);
-    printf("token: %s\n", token);
-    while (1) {
-        token = strtok_r(NULL, " ", &saveptr);
-        printf("token: %s\n", token);
-        if (token == NULL) {
-            break;
-        }
-        subtoken = strtok_r(token, ":", &subsaveptr);
-        id = atoi(subtoken);
-        subtoken = strtok_r(NULL, ":", &subsaveptr);
-        val = atoi(subtoken);
-        printf("token: %s, %d:%d\n", token, id, val);
-    }
-
-    free(line);
-    return;
-}

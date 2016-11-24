@@ -14,15 +14,15 @@ typedef struct {
     double *values;
 } Matrix;
 
-void MatrixMultiply(Matrix a, Matrix b, Matrix c);
+void Matrix_Multiply(Matrix a, Matrix b, Matrix c);
 
-void MatrixAdd(Matrix a, Matrix b, Matrix c);
+void Matrix_Add(Matrix a, Matrix b, Matrix c);
 
-void MatrixScale(Matrix a, double n);
+void Matrix_Scale(Matrix a, double n);
 
-void MatrixPrint(Matrix m);
+void Matrix_Print(Matrix m);
 
-void MatrixTest(void);
+void Matrix_Test(void);
 
 #endif  /* __MATRIX_H__ */
 
