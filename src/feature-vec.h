@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define REDIS_ML_FV_ERROR_BAD_FORMAT "Feature vector parsing failed. Format should be : \'key:val,key:val\'..."
+
 #define MAX_NUM_FIELDS 1024
 
 typedef struct {

@@ -7,7 +7,7 @@
 MU_TEST(input_ok) {
     Feature *irFields = NULL;
     FeatureVec testIR = {0, irFields};
-    int ret = FeatureVec_Create("1:0.2,3:4,5:6,7:8", &testIR);
+    int ret = FeatureVec_Create("1:0.2,3:4,5:6,aleph:beit", &testIR);
     mu_check(ret == 0);
 }
 

@@ -58,7 +58,9 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     Feature *features = NULL;
     FeatureVec fv = {0, features};
-    FeatureVec_Create(data, &fv);
+    if(FeatureVec_Create(data, &fv) != 0){
+        return RedisModule_ReplyWithError(ctx, REDIS_ML_FV_ERROR_BAD_FORMAT);
+    }
 
     double rep = 0;
     if (classification) {
