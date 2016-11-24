@@ -2,11 +2,11 @@
 #include "math.h"
 
 double LinRegPredict(double *features, LinReg *lr) {
-  double p = 0;
-  for (int i = 0; i < lr->clen; i++) {
-    p += features[i] * lr->coefficients[i];
-  }
-  return p + lr->intercept;
+    double p = 0;
+    for (int i = 0; i < lr->clen; i++) {
+        p += features[i] * lr->coefficients[i];
+    }
+    return p + lr->intercept;
 }
 
 // private
@@ -15,7 +15,7 @@ double LinRegPredict(double *features, LinReg *lr) {
 // }
 
 double LogRegPredict(double *features, LinReg *lr) {
-  double m = LinRegPredict(features, lr);
-  double p = 1.0 / (1.0 + exp(-m));
-  return p;
+    double m = LinRegPredict(features, lr);
+    double p = 1.0 / (1.0 + exp(-m));
+    return p;
 }

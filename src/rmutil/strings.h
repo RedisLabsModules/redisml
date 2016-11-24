@@ -20,4 +20,5 @@ void RMUtil_StringToLower(RedisModuleString *s);
 
 /* Converts a redis string to uppercase in place without reallocating anything */
 void RMUtil_StringToUpper(RedisModuleString *s);
+
 #endif

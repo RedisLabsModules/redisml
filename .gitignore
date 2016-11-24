@@ -2,3 +2,15 @@
 *.so
 *.a
 *.pyc
+.cproject                                                                                                                                                                  
+.idea/                                                                                                                                                                     
+.project                                                                                                                                                                   
+.vscode/                                                                                                                                                                   
+CMakeLists.txt                                                                                                                                                             
+cmake-build-debug/                                                                                                                                                         
+src/nbproject/                                                                                                                                                             
+src/test/feature-vec_test                                                                                                                                                  
+src/test/test_matrix.sh
+src/test/tree_test  
+src/test/data/rand_data
+src/rmutil/test_vector

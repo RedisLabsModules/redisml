@@ -5,10 +5,10 @@
 RedisModuleType *RegressionType;
 
 void *RegressionTypeRdbLoad(RedisModuleIO *io, int encver) {
-  if (encver != REGRESSIONTYPE_ENCODING_VERSION) {
+    if (encver != REGRESSIONTYPE_ENCODING_VERSION) {
+        return NULL;
+    }
     return NULL;
-  }
-  return NULL;
 }
 
 void RegressionTypeRdbSave(RedisModuleIO *io, void *ptr) {}
@@ -21,12 +21,12 @@ void RegressionTypeDigest(RedisModuleDigest *digest, void *value) {}
 void RegressionTypeFree(void *value) {}
 
 int RegressionTypeRegister(RedisModuleCtx *ctx) {
-  RegressionType = RedisModule_CreateDataType(
-      ctx, REGRESSIONTYPE_NAME, 0, RegressionTypeRdbLoad, RegressionTypeRdbSave,
-      RegressionTypeAofRewrite, RegressionTypeDigest, RegressionTypeFree);
-  if (RegressionType == NULL) {
-    return REDISMODULE_ERR;
-  }
+    RegressionType = RedisModule_CreateDataType(
+            ctx, REGRESSIONTYPE_NAME, 0, RegressionTypeRdbLoad, RegressionTypeRdbSave,
+            RegressionTypeAofRewrite, RegressionTypeDigest, RegressionTypeFree);
+    if (RegressionType == NULL) {
+        return REDISMODULE_ERR;
+    }
 
-  return REDISMODULE_OK;
+    return REDISMODULE_OK;
 }

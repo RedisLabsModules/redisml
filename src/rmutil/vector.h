@@ -1,5 +1,6 @@
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>

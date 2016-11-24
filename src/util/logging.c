@@ -1,6 +1,6 @@
 #include "logging.h"
 
-int LOGGING_LEVEL = 0; 
+int LOGGING_LEVEL = 0;
 //L_DEBUG | L_INFO
 
 
