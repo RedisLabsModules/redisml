@@ -5,7 +5,7 @@
 
 #include "feature-vec.h"
 #include "forest.h"
-
+#include "util/logging.h"
 
 __forest_Node *__newNode(char *splitterAttr) {
     __forest_Node *n = (__forest_Node *) malloc(sizeof(__forest_Node));
@@ -245,8 +245,66 @@ double Forest_TreeClassify(FeatureVec *ir, __forest_Node *root) {
     return Forest_TreeClassify(ir, root->right);
 }
 
+/*2D array comperator for the qsort*/
+static int cmp2D(const void *p1, const void *p2) {
+    return (int) (((const double *) p2)[1] - ((const double *) p1)[1]);
+}
+
+/*Classify a feature vector with a full forest.
+ * classification: majority voting of the trees.
+ * regression: avg of the votes.*/
+double Forest_Classify(FeatureVec fv, Forest *f, int classification){
+    double rep = 0;
+    if (classification) {
+        LG_DEBUG("classification");
+        double results[1024][2] = {{-1}};
+        long class;
+        long maxClass = 0;
+        for (int i = 0; i < (int) f->len; i++) {
+            class = (long) Forest_TreeClassify(&fv, f->Trees[i]->root) % 1024;
+            results[class][0] = (double) class;
+            results[class][1]++;
+            if (class > maxClass) {
+                maxClass = class;
+            }
+        }
+        qsort(&results[0], 1024, sizeof(results[0]), cmp2D);
+        rep = results[0][0];
+    } else {
+        LG_DEBUG("regression");
+        for (int i = 0; i < (int) f->len; i++) {
+            rep += Forest_TreeClassify(&fv, f->Trees[i]->root);
+        }
+        rep /= (int) f->len;
+    }
+    return rep;
+}
+
+
+static void __forest_genSubTree(__forest_Node **root, char *path, int val, int depth) {
+    __forest_Node *n;
+    char *lpath = malloc(strlen(path) + 2);
+    sprintf(lpath, "%sl", path);
+    char *rpath = malloc(strlen(path) + 2);
+    sprintf(rpath, "%sr", path);
+
+    printf("path: %s, val: %d, depth: %d\n", path, val, depth);
+    if (depth <= 0) {
+        n = Forest_NewLeaf(val);
+        Forest_TreeAdd(root, path, n);
+        return;
+    }
+    char strval[32];
+    sprintf(strval,"%d",val);
+    n = Forest_NewNumericalNode(strval, val);
+    Forest_TreeAdd(root, path, n);
+    __forest_genSubTree(root, lpath, val - (1 << (depth - 1)), depth - 1);
+    __forest_genSubTree(root, rpath, val + (1 << (depth - 1)), depth - 1);
+}
+
 void Forest_TreeTest() {
-    Tree t = {.root = NULL};
+    Forest_Tree t = {.root = NULL};
+    __forest_genSubTree(&t.root, ".", 300, 10);
     __forest_Node *n1 = Forest_NewNumericalNode("1", 1.0);
     __forest_Node *n2 = Forest_NewNumericalNode("2", 2.0);
     __forest_Node *n3 = Forest_NewNumericalNode("3", 3.0);
@@ -278,7 +336,7 @@ void Forest_TreeTest() {
     printf("slen: %d\n", len);
     printf("sizeof(__forest_Node): %ld\n", sizeof(__forest_Node));
 
-    Tree dst = {.root = NULL};
+    Forest_Tree dst = {.root = NULL};
     printf("s: %p\n", s);
     Forest_TreeDeSerialize(s, &dst.root, len);
     printf("3***3\n");

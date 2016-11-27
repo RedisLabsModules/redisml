@@ -25,11 +25,6 @@ int ForestTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     return REDISMODULE_OK;
 }
 
-/*2D array comperator for the qsort*/
-static int cmp2D(const void *p1, const void *p2) {
-    return (int) (((const double *) p2)[1] - ((const double *) p1)[1]);
-}
-
 /*ml.forest.run <forest> <data_item> [CLASSIFICATION|REGRESSION]*/
 int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (argc < 3) {
@@ -62,30 +57,7 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_ReplyWithError(ctx, REDIS_ML_FV_ERROR_BAD_FORMAT);
     }
 
-    double rep = 0;
-    if (classification) {
-        LG_DEBUG("classification");
-        double results[1024][2] = {{-1}};
-        long class;
-        long maxClass = 0;
-        for (int i = 0; i < (int) f->len; i++) {
-            class = (long) Forest_TreeClassify(&fv, f->Trees[i]->root) % 1024;
-            results[class][0] = (double) class;
-            results[class][1]++;
-            if (class > maxClass) {
-                maxClass = class;
-            }
-        }
-        qsort(&results[0], 1024, sizeof(results[0]), cmp2D);
-        rep = results[0][0];
-    } else {
-        LG_DEBUG("regression");
-        for (int i = 0; i < (int) f->len; i++) {
-            rep += Forest_TreeClassify(&fv, f->Trees[i]->root);
-        }
-        rep /= (int) f->len;
-    }
-
+    double rep = Forest_Classify(fv, f, classification);
     RedisModule_ReplyWithDouble(ctx, rep);
     return REDISMODULE_OK;
 }
@@ -159,11 +131,11 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_ReplyWithError(ctx, REDIS_ML_ERROR_GENERIC);
     }
 
-    Tree *t;
+    Forest_Tree *t;
     if (tid == (f->len)) {
         f->len++;
-        f->Trees = realloc(f->Trees, f->len * sizeof(Tree *));
-        t = malloc(sizeof(Tree));
+        f->Trees = realloc(f->Trees, f->len * sizeof(Forest_Tree *));
+        t = malloc(sizeof(Forest_Tree));
         f->Trees[f->len - 1] = t;
     } else {
         t = f->Trees[(int) tid];

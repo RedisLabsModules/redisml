@@ -37,11 +37,11 @@ typedef struct node {
 
 typedef struct {
     __forest_Node *root;
-} Tree;
+} Forest_Tree;
 
 typedef struct {
     size_t len;
-    Tree **Trees;
+    Forest_Tree **Trees;
 } Forest;
 
 __forest_Node *Forest_NewNumericalNode(char *splitterAttr, double splitterVal);
@@ -63,6 +63,8 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
 void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen);
 
 double Forest_TreeClassify(FeatureVec *ir, __forest_Node *root);
+
+double Forest_Classify(FeatureVec fv, Forest *f, int classification);
 
 void Forest_TreeTest();
 

@@ -11,10 +11,10 @@ void *ForestTypeRdbLoad(RedisModuleIO *io, int encver) {
     Forest *f;
     f = malloc(sizeof(*f));
     f->len = RedisModule_LoadUnsigned(io);
-    f->Trees = malloc(f->len * sizeof(Tree *));
+    f->Trees = malloc(f->len * sizeof(Forest_Tree *));
 
     for (int i = 0; i < f->len; i++) {
-        Tree *t = malloc(sizeof(Tree));
+        Forest_Tree *t = malloc(sizeof(Forest_Tree));
         f->Trees[i] = t;
         size_t tlen;
         char *s = RedisModule_LoadStringBuffer(io, &tlen);
