@@ -17,6 +17,13 @@ double FeatureVec_GetValue(FeatureVec *ir, char *key) {
     return 0;
 }
 
+double FeatureVec_NumericGetValue(FeatureVec *ir, int nkey) {
+    if (nkey > 0 && nkey < MAX_NUM_FIELDS) {
+        return ir->NumericFields[nkey];
+    }
+    return 0;
+}
+
 void FeatureVec_Print(FeatureVec *ir) {
     printf("strings:\n");
     for (int i = 0; i < ir->len; i++) {
@@ -31,7 +38,7 @@ void FeatureVec_Print(FeatureVec *ir) {
     }
 }
 
-int FeatureVec_Create(char *data, FeatureVec *ir) {
+int FeatureVec_Create(char *data, FeatureVec *fv) {
     char *start, *token, *saveptr = NULL, *subtoken1, *subtoken2,
             *subsaveptr = NULL;
     int fieldIndex = 0;
@@ -46,12 +53,12 @@ int FeatureVec_Create(char *data, FeatureVec *ir) {
         /* try to add numeric field */
         int nkey = (int) atof(subtoken1);
         if (nkey > 0 && nkey < MAX_NUM_FIELDS) {
-            ir->NumericFields[nkey] = atof(subtoken2);
+            fv->NumericFields[nkey] = atof(subtoken2);
         } else {
-            ir->Features = realloc(ir->Features, sizeof(Feature) * (fieldIndex + 2));
-            ir->Features[fieldIndex].key = strndup(subtoken1, strlen(subtoken1));
-            ir->Features[fieldIndex].value = atof(subtoken2);
-            ir->len++;
+            fv->Features = realloc(fv->Features, sizeof(Feature) * (fieldIndex + 2));
+            fv->Features[fieldIndex].key = strndup(subtoken1, strlen(subtoken1));
+            fv->Features[fieldIndex].value = atof(subtoken2);
+            fv->len++;
             fieldIndex++;
         }
 

@@ -10,7 +10,7 @@
 #include "matrix-type.h"
 #include "forest-type.h"
 #include "regression-type.h"
-#include "matrix.h"
+#include "util/thpool.h"
 
 #define RLMODULE_NAME "REDIS-ML"
 #define RLMODULE_VERSION "1.0.0"
@@ -167,10 +167,14 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
         }
         int err = Forest_TreeAdd(&t->root, path, n);
+        Forest_TreePrint(t->root, ".", 0);
         if (err != FOREST_OK) {
             return REDISMODULE_ERR;
         }
     }
+#ifdef FOREST_USE_FAST_TREE
+    Forest_GenFastTree(t);
+#endif
     RedisModule_ReplyWithSimpleString(ctx, "OK");
     return REDISMODULE_OK;
 }
@@ -543,7 +547,10 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
     RMUtil_RegisterReadCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
     RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 
-    LOGGING_INIT(L_WARN);
+    LOGGING_INIT(L_DEBUG);
+
+    Forest_thpool = thpool_init(FOREST_NUM_THREADS);
+
     LG_DEBUG("module loaded ok.");
     return REDISMODULE_OK;
 }

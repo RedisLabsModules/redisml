@@ -5,9 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include "feature-vec.h"
+#include "util/thpool.h"
 
 #define FOREST_OK 0
 #define FOREST_ERR 1
+#define FOREST_NUM_THREADS 8
+
+//#define FOREST_USE_THREADS
+//#define FOREST_USE_FAST_TREE
+
+threadpool Forest_thpool;
 
 typedef enum {
     S_CATEGORICAL,
@@ -21,7 +28,7 @@ typedef enum {
 } __forest_NodeType;
 
 typedef union {
-    double fval;
+    double *fval;
     char *strval;
 } __forest_SplitterVal;
 
@@ -29,14 +36,24 @@ typedef struct node {
     double predVal;
     __forest_NodeType type;
     char *splitterAttr;
+    int numericSplitterAttr;
     __forest_SplitterType splitterType;
     __forest_SplitterVal splitterVal;
+    int splitterValLen;
     struct node *left;
     struct node *right;
 } __forest_Node;
 
 typedef struct {
+    int key;
+    double val;
+    int left;
+    int right;
+} __fast_Node;
+
+typedef struct {
     __forest_Node *root;
+    __fast_Node *fastTree;
 } Forest_Tree;
 
 typedef struct {
@@ -52,6 +69,8 @@ __forest_Node *Forest_NewLeaf(double);
 
 int Forest_TreeAdd(__forest_Node **root, char *path, __forest_Node *n);
 
+void Forest_GenFastTree (Forest_Tree *t);
+
 __forest_Node *Forest_TreeGet(__forest_Node *root, char *path);
 
 void Forest_TreePrint(__forest_Node *root, char *path, int step);
@@ -62,7 +81,7 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
 
 void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen);
 
-double Forest_TreeClassify(FeatureVec *ir, __forest_Node *root);
+double Forest_TreeClassify(FeatureVec *fv, __forest_Node *root);
 
 double Forest_Classify(FeatureVec fv, Forest *f, int classification);
 
