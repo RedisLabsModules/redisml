@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
+do_kill=0
 if pgrep redis-server > /dev/null
 then
     echo "Trying with running Redis"
 else
     echo "Starting Redis"
     redis-server --loadmodule ../redis-ml.so &
+    do_kill=1
     sleep 1
 fi
 
@@ -40,4 +42,11 @@ done
 echo run:
 redis-cli ml.forest.run "f1" "a:2,b:4,1:0.01"
 
-pkill redis-server
+if [ $do_kill -eq 1 ]
+then
+    echo "killing server"
+    pkill redis-server
+fi
+
+sleep 1
+echo "done"

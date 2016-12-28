@@ -62,6 +62,31 @@ int ForestRunCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     return REDISMODULE_OK;
 }
 
+/*ml.forest.print <forest> <tree_id>*/
+int ForestPrintCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+    if (argc < 3) {
+        return RedisModule_WrongArity(ctx);
+    }
+
+    RedisModule_AutoMemory(ctx);
+
+    char *tid;
+    RMUtil_ParseArgs(argv, argc, 2, "c", &tid);
+
+    Forest *f;
+    RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
+    int type = RedisModule_KeyType(key);
+    if (type == REDISMODULE_KEYTYPE_EMPTY ||
+        RedisModule_ModuleTypeGetType(key) != ForestType) {
+        return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+    }
+    f = RedisModule_ModuleTypeGetValue(key);
+
+    Forest_TreePrint(f->Trees[atoi(tid)]->root, ".", 0);
+    RedisModule_ReplyWithSimpleString(ctx, "todo: return as string\n");
+    return REDISMODULE_OK;
+}
+
 /*
  * rediforest.ADD <forestId> <treeId> <path> [[NUMERIC|CATEGORIC] <splitterAttr>
  * <splitterVal] | [LEAF] <predVal>]
@@ -167,11 +192,12 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
         }
         int err = Forest_TreeAdd(&t->root, path, n);
-        Forest_TreePrint(t->root, ".", 0);
         if (err != FOREST_OK) {
             return REDISMODULE_ERR;
         }
     }
+    /*Normalize tree values*/
+    Forest_NormalizeTree(t);
 #ifdef FOREST_USE_FAST_TREE
     Forest_GenFastTree(t);
 #endif
@@ -527,6 +553,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
     RMUtil_RegisterWriteCmd(ctx, "ml.forest.add", ForestAddCommand);
     RMUtil_RegisterReadCmd(ctx, "ml.forest.run", ForestRunCommand);
     RMUtil_RegisterWriteCmd(ctx, "ml.forest.test", ForestTestCommand);
+    RMUtil_RegisterWriteCmd(ctx, "ml.forest.print", ForestPrintCommand);
 
     /*Register LINREG data type and commands*/
     if (RegressionTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;

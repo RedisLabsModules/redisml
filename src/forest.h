@@ -10,6 +10,7 @@
 #define FOREST_OK 0
 #define FOREST_ERR 1
 #define FOREST_NUM_THREADS 8
+#define FOREST_MAX_CLASSES 2048
 
 //#define FOREST_USE_THREADS
 //#define FOREST_USE_FAST_TREE
@@ -54,6 +55,8 @@ typedef struct {
 typedef struct {
     __forest_Node *root;
     __fast_Node *fastTree;
+    int numClasses;
+    double *classCoefficients;
 } Forest_Tree;
 
 typedef struct {
@@ -70,6 +73,8 @@ __forest_Node *Forest_NewLeaf(double);
 int Forest_TreeAdd(__forest_Node **root, char *path, __forest_Node *n);
 
 void Forest_GenFastTree (Forest_Tree *t);
+
+void Forest_NormalizeTree (Forest_Tree *t);
 
 __forest_Node *Forest_TreeGet(__forest_Node *root, char *path);
 
