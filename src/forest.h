@@ -41,6 +41,9 @@ typedef struct node {
     __forest_SplitterType splitterType;
     __forest_SplitterVal splitterVal;
     int splitterValLen;
+    double *stats;
+    int statsLen;
+    int statsTotal;
     struct node *left;
     struct node *right;
 } __forest_Node;
@@ -68,7 +71,7 @@ __forest_Node *Forest_NewNumericalNode(char *splitterAttr, double splitterVal);
 
 __forest_Node *Forest_NewCategoricalNode(char *splitterAttr, char *splitterVal);
 
-__forest_Node *Forest_NewLeaf(double);
+__forest_Node *Forest_NewLeaf(double, char*);
 
 int Forest_TreeAdd(__forest_Node **root, char *path, __forest_Node *n);
 
@@ -86,7 +89,7 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
 
 void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen);
 
-double Forest_TreeClassify(FeatureVec *fv, __forest_Node *root);
+__forest_Node *Forest_TreeClassify(FeatureVec *fv, __forest_Node *root);
 
 double Forest_Classify(FeatureVec fv, Forest *f, int classification);
 

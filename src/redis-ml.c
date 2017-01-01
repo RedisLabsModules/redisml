@@ -89,7 +89,7 @@ int ForestPrintCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
 
 /*
  * rediforest.ADD <forestId> <treeId> <path> [[NUMERIC|CATEGORIC] <splitterAttr>
- * <splitterVal] | [LEAF] <predVal>]
+ * <splitterVal] | [LEAF] <predVal> <stats>]
  */
 int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (argc < 6) {
@@ -134,7 +134,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             argIdx += 2;
             continue;
         } else if (strncasecmp(nodeType, "LEAF", strlen(nodeType)) == 0) {
-            argIdx++;
+            argIdx+= 2;
             continue;
         } else {
             return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
@@ -185,9 +185,10 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             argIdx += 2;
         } else if (strncasecmp(nodeType, "LEAF", strlen(nodeType)) == 0) {
             double predVal;
-            RMUtil_ParseArgs(argv, argc, argIdx, "d", &predVal);
-            n = Forest_NewLeaf(predVal);
-            argIdx++;
+            char *stats;
+            RMUtil_ParseArgs(argv, argc, argIdx, "dc", &predVal, &stats);
+            n = Forest_NewLeaf(predVal, stats);
+            argIdx+= 2;
         } else {
             return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE);
         }
@@ -574,7 +575,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
     RMUtil_RegisterReadCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
     RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 
-    LOGGING_INIT(L_DEBUG);
+    LOGGING_INIT(L_ERROR);
 
     Forest_thpool = thpool_init(FOREST_NUM_THREADS);
 

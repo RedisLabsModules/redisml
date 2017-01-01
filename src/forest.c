@@ -20,6 +20,7 @@ __forest_Node *__newNode(char *splitterAttr) {
     n->splitterValLen = 0;
     n->left = NULL;
     n->right = NULL;
+    n->stats = NULL;
     return n;
 }
 
@@ -51,9 +52,28 @@ __forest_Node *Forest_NewCategoricalNode(char *splitterAttr, char *sv) {
     return n;
 }
 
-__forest_Node *Forest_NewLeaf(double predVal) {
+__forest_Node *Forest_NewLeaf(double predVal, char* stats) {
     __forest_Node *n = __newNode(NULL);
     n->type = N_LEAF;
+    int len = 0;
+    int total = 0;
+    char *str = strdup(stats);
+    char *s2 = strdup(stats);
+    char *v;
+    while ((v = strsep(&str, ":"))) {
+        len++;
+        total += atoi(v);
+    }
+    LG_DEBUG("adding stats: %s, len: %d", stats, len);
+    n->stats = calloc(len, sizeof(double));
+    len = 0;
+    while ((v = strsep(&s2, ":"))) {
+        n->stats[len] = (double)atoi(v);
+        LG_DEBUG("stats[%d]: %.3lf", len, n->stats[len]);
+        len++;
+    }
+    n->statsTotal = total;
+    n->statsLen = len;
     n->predVal = predVal;
     return n;
 }
@@ -260,7 +280,7 @@ void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen) {
                 n = Forest_NewCategoricalNode(splitterAttr, s + pos);
             }
         } else {
-            n = Forest_NewLeaf(predVal);
+            n = Forest_NewLeaf(predVal, "");
         }
         Forest_TreeAdd(root, path, n);
         LG_DEBUG("last pos: %d\n", pos);
@@ -297,14 +317,14 @@ void Forest_NormalizeTree(Forest_Tree *t) {
 }
 
 
-double Forest_TreeClassify(FeatureVec *fv, __forest_Node *root) {
+__forest_Node *Forest_TreeClassify(FeatureVec *fv, __forest_Node *root) {
     if (root == NULL) {
         LG_DEBUG("Forest_TreeClassify reached NULL node\n");
-        return 0;
+        return NULL;
     }
     if (root->type == N_LEAF) {
         LG_DEBUG("leaf: %lf", root->predVal);
-        return root->predVal;
+        return root;
     }
     double attrVal;
 //    if (root->numericSplitterAttr) {
@@ -365,22 +385,26 @@ double Forest_Classify(FeatureVec fv, Forest *f, int classification) {
 
     if (classification) {
         LG_DEBUG("\nclassification:");
-        long class;
         for (int i = 0; i < (int) f->len; i++) {
-            class = (long) Forest_TreeClassify(&fv, f->Trees[i]->root);
-            results[class][0] = (double) class;
-            results[class][1] += f->Trees[i]->classCoefficients[class];
+            __forest_Node *n = Forest_TreeClassify(&fv, f->Trees[i]->root);
+            // printf("tid %d stats (%d): [", i, n->statsTotal);
+            for (int j=0; j < n->statsLen; j++){
+                // printf("%.2lf,", n->stats[j]);
+                results[j][0] = (double) j;
+                results[j][1] += n->stats == NULL ? 1: n->stats[j]/n->statsTotal;
+            }
+            // printf("]\n");
         }
         //thpool_wait(Forest_thpool);
         qsort(&results[0], FOREST_MAX_CLASSES, sizeof(results[0]), cmp2D);
         rep = results[0][0];
         for (int i = 0; i < 10; ++i) {
-            LG_DEBUG("results[%d]: %.1lf,%.3lf", i, results[i][0], results[i][1]);
+            // printf("results[%d]: %.1lf,%.2lf\n", i, results[i][0], results[i][1]);
         }
     } else {
         LG_DEBUG("regression");
         for (int i = 0; i < (int) f->len; i++) {
-            rep += Forest_TreeClassify(&fv, f->Trees[i]->root);
+            rep += Forest_TreeClassify(&fv, f->Trees[i]->root)->predVal;
         }
         rep /= (int) f->len;
     }
@@ -398,7 +422,7 @@ static void __forest_genSubTree(__forest_Node **root, char *path, int depth) {
 
     double val = (double) rand() / RAND_MAX;
     if (depth <= 0) {
-        n = Forest_NewLeaf(val);
+        n = Forest_NewLeaf(val, "");
         Forest_TreeAdd(root, path, n);
         return;
     }
@@ -459,11 +483,11 @@ void Forest_TreeTest() {
     __forest_Node *n3 = Forest_NewNumericalNode("3", 3.0);
     __forest_Node *n4 = Forest_NewNumericalNode("4", 4.0);
 
-    __forest_Node *n5 = Forest_NewLeaf(5.0);
-    __forest_Node *n6 = Forest_NewLeaf(6.0);
-    __forest_Node *n7 = Forest_NewLeaf(7.0);
-    __forest_Node *n8 = Forest_NewLeaf(8.0);
-    __forest_Node *n9 = Forest_NewLeaf(9.0);
+    __forest_Node *n5 = Forest_NewLeaf(5.0, "");
+    __forest_Node *n6 = Forest_NewLeaf(6.0, "");
+    __forest_Node *n7 = Forest_NewLeaf(7.0, "");
+    __forest_Node *n8 = Forest_NewLeaf(8.0, "");
+    __forest_Node *n9 = Forest_NewLeaf(9.0, "");
 
     Forest_TreeAdd(&t.root, ".", n1);
     Forest_TreeAdd(&t.root, ".l", n2);
