@@ -541,12 +541,17 @@ int MatrixTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 }
 
 /*Initialize the module*/
-int RedisModule_OnLoad(RedisModuleCtx *ctx) {
+int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+//int RedisModule_OnLoad(RedisModuleCtx *ctx) {
     /* Register the module itself*/
     if (RedisModule_Init(ctx, "redis-ml", 1, REDISMODULE_APIVER_1) ==
         REDISMODULE_ERR) {
         return REDISMODULE_ERR;
     }
+
+    //if (argc == 1) {
+    //    RMUtil_ParseArgs(argv, argc, 0, "l", &FOREST_NUM_THREADS);
+    //}
 
     /* Register Forest data type and functions*/
     if (ForestTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
@@ -579,6 +584,6 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx) {
 
     Forest_thpool = thpool_init(FOREST_NUM_THREADS);
 
-    LG_DEBUG("module loaded ok.");
+    printf("module loaded ok, threads: %d\n", FOREST_NUM_THREADS);
     return REDISMODULE_OK;
 }

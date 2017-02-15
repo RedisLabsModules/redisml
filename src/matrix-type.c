@@ -21,9 +21,14 @@ void MatrixTypeDigest(RedisModuleDigest *digest, void *value) {}
 void MatrixTypeFree(void *value) {}
 
 int MatrixTypeRegister(RedisModuleCtx *ctx) {
-    MatrixType = RedisModule_CreateDataType(
-            ctx, MATRIXTYPE_NAME, 0, MatrixTypeRdbLoad, MatrixTypeRdbSave,
-            MatrixTypeAofRewrite, MatrixTypeDigest, MatrixTypeFree);
+
+    RedisModuleTypeMethods tm = {.version = REDISMODULE_TYPE_METHOD_VERSION,
+        .rdb_load = MatrixTypeRdbLoad,
+        .rdb_save = MatrixTypeRdbSave,
+        .aof_rewrite = MatrixTypeAofRewrite,
+        .free = MatrixTypeFree};
+
+    MatrixType = RedisModule_CreateDataType(ctx, MATRIXTYPE_NAME, 0, &tm);
     if (MatrixType == NULL) {
         return REDISMODULE_ERR;
     }

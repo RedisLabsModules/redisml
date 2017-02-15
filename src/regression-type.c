@@ -21,9 +21,14 @@ void RegressionTypeDigest(RedisModuleDigest *digest, void *value) {}
 void RegressionTypeFree(void *value) {}
 
 int RegressionTypeRegister(RedisModuleCtx *ctx) {
+    RedisModuleTypeMethods tm = {.version = REDISMODULE_TYPE_METHOD_VERSION,
+        .rdb_load = RegressionTypeRdbLoad,
+        .rdb_save = RegressionTypeRdbSave,
+        .aof_rewrite = RegressionTypeAofRewrite,
+        .free = RegressionTypeFree};
+
     RegressionType = RedisModule_CreateDataType(
-            ctx, REGRESSIONTYPE_NAME, 0, RegressionTypeRdbLoad, RegressionTypeRdbSave,
-            RegressionTypeAofRewrite, RegressionTypeDigest, RegressionTypeFree);
+            ctx, REGRESSIONTYPE_NAME, 0, &tm);
     if (RegressionType == NULL) {
         return REDISMODULE_ERR;
     }

@@ -49,12 +49,19 @@ void ForestTypeFree(void *value) {
 }
 
 int ForestTypeRegister(RedisModuleCtx *ctx) {
+    RedisModuleTypeMethods tm = {.version = REDISMODULE_TYPE_METHOD_VERSION,
+        .rdb_load = ForestTypeRdbLoad,
+        .rdb_save = ForestTypeRdbSave,
+        .aof_rewrite = ForestTypeAofRewrite,
+        .free = ForestTypeFree};
+
+
     ForestType = RedisModule_CreateDataType(
-            ctx, FORESTTYPE_NAME, 0, ForestTypeRdbLoad, ForestTypeRdbSave,
-            ForestTypeAofRewrite, ForestTypeDigest, ForestTypeFree);
+            ctx, FORESTTYPE_NAME, 0, &tm);
     if (ForestType == NULL) {
         return REDISMODULE_ERR;
     }
 
     return REDISMODULE_OK;
 }
+
