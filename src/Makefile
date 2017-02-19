@@ -31,6 +31,15 @@ redis-ml.so: rmutil/librmutil.a redis-ml.o $(OBJS)
 rmutil/librmutil.a:
 	echo "making rmutil" && cd rmutil && $(MAKE) all
 
+rmalloc.o: rmalloc.h
+forest.o: forest.h
+forest-type.o: forest-type.h
+feature-vec.o: feature-vec.h
+reg.o: reg.h
+regression-type.o: regression-type.h
+matrix.o: matrix.h
+matrix-type.o: matrix-type.h
+
 clean:
 	rm -rf *.xo *.so *.o
 

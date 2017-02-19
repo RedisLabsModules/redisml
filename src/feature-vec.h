@@ -1,5 +1,5 @@
-#ifndef __READER_H__
-#define __READER_H__
+#ifndef __FEATUREVEC_H__
+#define __FEATUREVEC_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,4 +26,4 @@ void FeatureVec_Print(FeatureVec *ir);
 
 double FeatureVec_GetValue(FeatureVec *ir, char *key);
 double FeatureVec_NumericGetValue(FeatureVec *ir, int nkey);
-#endif  /* __READER_H__ */
+#endif  /* __FEATUREVEC_H__ */

@@ -1,5 +1,5 @@
-#ifndef __TREE_H__
-#define __TREE_H__
+#ifndef __FOREST_H__
+#define __FOREST_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,5 +95,5 @@ double Forest_Classify(FeatureVec fv, Forest *f, int classification);
 
 void Forest_TreeTest();
 
-#endif  /* __TREE_H__ */
+#endif  /* __FOREST_H__ */
 
