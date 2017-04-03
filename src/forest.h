@@ -10,11 +10,11 @@
 #define FOREST_OK 0
 #define FOREST_ERR 1
 #define FOREST_MAX_CLASSES 128
-#define FOREST_NUM_THREADS 4
 
 #define FOREST_USE_THREADS
 //#define FOREST_USE_FAST_TREE
 
+int FOREST_NUM_THREADS;
 threadpool Forest_thpool;
 
 typedef enum {

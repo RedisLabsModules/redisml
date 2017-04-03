@@ -401,7 +401,8 @@ static void classifierTask(void *id){
  * classification: majority voting of the trees.
  * regression: avg of the votes.*/
 double Forest_Classify(FeatureVec fv, Forest *f, int classification) {
-    double threadResults[FOREST_MAX_CLASSES * FOREST_NUM_THREADS] = {0};
+    double threadResults[FOREST_MAX_CLASSES * FOREST_NUM_THREADS];
+    memset(threadResults, 0, FOREST_MAX_CLASSES * FOREST_NUM_THREADS * sizeof(double));
     double results[FOREST_MAX_CLASSES][2] = {{0}};
     int tids[FOREST_NUM_THREADS];
     double rep = 0;

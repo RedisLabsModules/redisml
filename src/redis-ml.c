@@ -549,9 +549,11 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
         return REDISMODULE_ERR;
     }
 
-    //if (argc == 1) {
-    //    RMUtil_ParseArgs(argv, argc, 0, "l", &FOREST_NUM_THREADS);
-    //}
+    if (argc == 1) {
+        RMUtil_ParseArgs(argv, argc, 0, "l", &FOREST_NUM_THREADS);
+    } else {
+        FOREST_NUM_THREADS = 4;
+    }
 
     /* Register Forest data type and functions*/
     if (ForestTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
