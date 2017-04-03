@@ -181,6 +181,7 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
     LG_DEBUG("******\npathSize: %ld\n", pathSize);
     size_t splitterSize = 0;
     size_t splitteAttrLen = 0;
+    size_t statsLen = 0;
     if (root->type != N_LEAF) {
         if (root->splitterType == S_NUMERICAL) {
             splitterSize = sizeof(double);
@@ -188,10 +189,12 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
             splitterSize = strlen(root->splitterVal.strval) + 1;
         }
         splitteAttrLen = strlen(root->splitterAttr) + 1 + sizeof(__forest_SplitterType);
+    } else {
+        statsLen = root->statsLen;
     }
 
     len += sizeof(int) + pathSize + 1 + sizeof(double) + splitteAttrLen +
-        splitterSize;
+        splitterSize  + statsLen * sizeof(double) + sizeof(int) + sizeof(int);
     LG_DEBUG("len: %d\n", len);
     *dst = realloc(*dst, len);
     char *s = *dst;
@@ -235,6 +238,15 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
         len = Forest_TreeSerialize(dst, root->left, &nextpath, plen + 1, len);
         nextpath |= 1;
         len = Forest_TreeSerialize(dst, root->right, &nextpath, plen + 1, len);
+    } else {
+        *((int *) (s + pos)) = root->statsLen;
+        pos += sizeof(int);
+        *((int *) (s + pos)) = root->statsTotal;
+        pos += sizeof(int);
+        for(int i=0; i < statsLen; i++){
+            *((double *) (s + pos)) = root->stats[i];
+            pos += sizeof(double);
+        }
     }
     return len;
 }
@@ -280,6 +292,15 @@ void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen) {
             }
         } else {
             n = Forest_NewLeaf(predVal, "");
+            n->statsLen = *((int *) (s + pos));
+            pos += sizeof(int);
+            n->statsTotal = *((int *) (s + pos));
+            pos += sizeof(int);
+            n->stats = calloc(n->statsLen, sizeof(double));
+            for(int i = 0; i < n->statsLen; i++){
+                n->stats[i] = *((double *) (s + pos));
+                pos += sizeof(double);
+            }
         }
         Forest_TreeAdd(root, path, n);
         LG_DEBUG("last pos: %d\n", pos);
