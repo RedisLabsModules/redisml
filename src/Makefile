@@ -18,11 +18,12 @@ else
 	SHOBJ_CFLAGS ?= -dynamic -fno-common -g -ggdb
 	SHOBJ_LDFLAGS ?= -bundle -undefined dynamic_lookup
 endif
-CFLAGS = -I$(RM_INCLUDE_DIR) -Wall -g -fPIC -lc -lm -lcblas -O2 -std=gnu99  
+CFLAGS = -I$(RM_INCLUDE_DIR) -Wall -g -fPIC -lc -lm -lcblas -O2 -std=gnu99 -pthread 
 CC=gcc
 
 OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matrix.o matrix-type.o util/logging.o util/thpool.o
 
+.PHONY: all
 all: redis-ml.so  
 
 redis-ml.so: rmutil/librmutil.a redis-ml.o $(OBJS)
@@ -40,6 +41,12 @@ regression-type.o: regression-type.h
 matrix.o: matrix.h
 matrix-type.o: matrix-type.h
 
+.PHONY: test
+test:
+	$(MAKE) -C ./test clean all test
+	$(MAKE) -C ./test/pytest test
+
+.PHONY: clean
 clean:
 	rm -rf *.xo *.so *.o
 
