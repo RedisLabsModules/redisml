@@ -182,6 +182,7 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
     size_t splitterSize = 0;
     size_t splitteAttrLen = 0;
     size_t statsLen = 0;
+    size_t statsSize = 0;
     if (root->type != N_LEAF) {
         if (root->splitterType == S_NUMERICAL) {
             splitterSize = sizeof(double);
@@ -191,10 +192,11 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
         splitteAttrLen = strlen(root->splitterAttr) + 1 + sizeof(__forest_SplitterType);
     } else {
         statsLen = root->statsLen;
+        statsSize = statsLen * sizeof(double) + sizeof(int) + sizeof(int);
     }
 
     len += sizeof(int) + pathSize + 1 + sizeof(double) + splitteAttrLen +
-        splitterSize  + statsLen * sizeof(double) + sizeof(int) + sizeof(int);
+        splitterSize  + statsSize;
     LG_DEBUG("len: %d\n", len);
     *dst = realloc(*dst, len);
     char *s = *dst;
