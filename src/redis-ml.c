@@ -369,17 +369,13 @@ int MatrixUpdateCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
             RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ | REDISMODULE_WRITE);
 
     int type = RedisModule_KeyType(key);
-    if (type != REDISMODULE_KEYTYPE_EMPTY &&
-        RedisModule_ModuleTypeGetType(key) != MatrixType) {
+    if (type == REDISMODULE_KEYTYPE_EMPTY || RedisModule_ModuleTypeGetType(key) != MatrixType) {
         return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
     }
 
     Matrix *m;
-    if (type == REDISMODULE_KEYTYPE_EMPTY) {
-        return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
-    } else {
-        m = RedisModule_ModuleTypeGetValue(key);
-    }
+    m = RedisModule_ModuleTypeGetValue(key);
+    
     int row = 0;
     int col =0;
     double val = 0;
