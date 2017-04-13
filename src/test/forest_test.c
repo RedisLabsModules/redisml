@@ -24,7 +24,7 @@ MU_TEST_SUITE(test_suite) {
 }
 
 int main(int argc, char **argv) {
-    printf("Testing reader\n");
+    printf("Testing forest\n");
     MU_RUN_SUITE(test_suite);
     MU_REPORT();
     exit(EXIT_SUCCESS);
