@@ -1,0 +1,20 @@
+site_name: Redis ML Documentation
+site_url: https://redislabsmodules.github.io/redis-ml/
+repo_url: https://github.com/RedisLabsModules/redis-ml
+repo_name: RedisLabsModules/redis-ml
+theme: material
+
+extra:
+  palette:
+    primary: 'grey'
+    accent: 'red'
+  logo: 'images/logo.png'
+  social:
+    - type: 'github'
+      link: 'https://github.com/redislabs'
+    - type: 'twitter'
+      link: 'https://twitter.com/redislabs'
+
+pages:
+    - 'Quickstart': 'index.md'
+    - 'Commands': 'commands.md'
