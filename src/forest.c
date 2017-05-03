@@ -56,20 +56,27 @@ __forest_Node *Forest_NewLeaf(double predVal, char* stats) {
     n->type = N_LEAF;
     int len = 0;
     int total = 0;
-    char *str = strdup(stats);
-    char *s2 = strdup(stats);
-    char *v;
-    while ((v = strsep(&str, ":"))) {
-        len++;
-        total += atoi(v);
-    }
-    LG_DEBUG("adding stats: %s, len: %d", stats, len);
-    n->stats = calloc(len, sizeof(double));
-    len = 0;
-    while ((v = strsep(&s2, ":"))) {
-        n->stats[len] = (double)atoi(v);
-        LG_DEBUG("stats[%d]: %.3lf", len, n->stats[len]);
-        len++;
+    if(stats){
+        char *str = strdup(stats);
+        char *s2 = strdup(stats);
+        char *v;
+        while ((v = strsep(&str, ":"))) {
+            len++;
+            total += atoi(v);
+        }
+        LG_DEBUG("adding stats: %s, len: %d", stats, len);
+        n->stats = calloc(len, sizeof(double));
+        len = 0;
+        while ((v = strsep(&s2, ":"))) {
+            n->stats[len] = (double)atoi(v);
+            LG_DEBUG("stats[%d]: %.3lf", len, n->stats[len]);
+            len++;
+        }
+    }else{
+        len = (int)predVal + 1;
+        total = 1; 
+        n->stats = calloc(len ,sizeof(double));
+        n->stats[len-1] = 1;
     }
     n->statsTotal = total;
     n->statsLen = len;
