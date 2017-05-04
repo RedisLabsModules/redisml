@@ -4,6 +4,14 @@ import unittest
 
 class MLTestCase(ModuleTestCase('../../redis-ml.so')):
     
+    def testForest(self):
+        with self.redis() as r:
+            
+            self.assertOk(r.execute_command('ml.forest.add','f_1', 0 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', 1, '.r', 'leaf' ,0 ,'stats', 2))
+            self.assertOk(r.execute_command('ml.forest.add','f_1', 1 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', 1, '.r', 'leaf' ,0 ,'stats', 2))
+            self.assertTrue(r.exists('f_1'))
+            self.assertEqual(r.execute_command('ml.forest.run', 'f_1', '1:0'), '0')
+    
     def testMatrix(self):
         with self.redis() as r:
             
