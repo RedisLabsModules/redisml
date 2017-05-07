@@ -597,7 +597,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     if (argc == 1) {
         RMUtil_ParseArgs(argv, argc, 0, "l", &FOREST_NUM_THREADS);
     } else {
-        FOREST_NUM_THREADS = 4;
+        FOREST_NUM_THREADS = 1;
     }
 
     /* Register Forest data type and functions*/

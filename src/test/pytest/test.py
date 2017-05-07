@@ -7,11 +7,16 @@ class MLTestCase(ModuleTestCase('../../redis-ml.so')):
     def testForest(self):
         with self.redis() as r:
             
-            self.assertOk(r.execute_command('ml.forest.add','f_1', 0 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', 1, '.r', 'leaf' ,0 ,'stats', 2))
-            self.assertOk(r.execute_command('ml.forest.add','f_1', 1 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', 1, '.r', 'leaf' ,0 ,'stats', 2))
+            self.assertOk(r.execute_command('ml.forest.add','f_1', 0 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, '.r', 'leaf' ,0))
+            self.assertOk(r.execute_command('ml.forest.add','f_1', 1 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, '.r', 'leaf' ,0))
             self.assertTrue(r.exists('f_1'))
-            self.assertEqual(r.execute_command('ml.forest.run', 'f_1', '1:0'), '0')
+            self.assertEqual(r.execute_command('ml.forest.run', 'f_1', '1:0'), '1')
     
+            self.assertOk(r.execute_command('ml.forest.add','f_2', 0 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', '5:0', '.r', 'leaf' ,0, 'stats', '0:1'))
+            self.assertTrue(r.exists('f_2'))
+            self.assertEqual(r.execute_command('ml.forest.run', 'f_2', '1:1'), '1')
+            self.assertOk(r.execute_command('ml.forest.add','f_2', 1 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', '0:8', '.r', 'leaf' ,0, 'stats', '5:1'))
+            self.assertEqual(r.execute_command('ml.forest.run', 'f_2', '1:1'), '0')
     def testMatrix(self):
         with self.redis() as r:
             
