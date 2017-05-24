@@ -298,6 +298,7 @@ void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen) {
             } else if (splitterType == S_CATEGORICAL) {
                 LG_DEBUG("categorical: %s\n", s + pos);
                 n = Forest_NewCategoricalNode(splitterAttr, s + pos);
+                pos += strlen(s + pos) + 1;
             }
         } else {
             n = Forest_NewLeaf(predVal, "");
