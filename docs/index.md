@@ -2,9 +2,9 @@
 
 Redis-ML is a Redis module that implements several machine learning models as Redis data types.
 
-The stored models are fully operational and support performing the prediction/evaluation.
+The stored models are fully operational and support performing the prediction/evaluation process.
 
-Redis-ML is a turn key solution for using trained models in a production environment. Allowing loading ML models from any platform immediately ready to serve.
+Redis-ML is a turn-key solution for using trained models in a production environment. Load ML models from any platform, immediately ready to serve.
 
 The module includes these primary features:
 
@@ -13,11 +13,11 @@ The module includes these primary features:
 * Logistic regression
 * Matrix operations
 
-## Building and running
+## Building and Running
 
 - Build a Redis server with support for modules (currently available from the [unstable branch](https://github.com/antirez/redis/tree/unstable)).
 
-- You'll also need a [BLAS](http://www.netlib.org/blas/) library, for example [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
+- You'll also need a [BLAS](http://www.netlib.org/blas/) library such as [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
 
   - Ubuntu: `sudo apt-get install libatlas-base-dev`
   - CentOS/RHEL/Fedora: `sudo yum install atlas-devel`
