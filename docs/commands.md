@@ -4,7 +4,7 @@
 
 ### Example of use
 
-The following creates a [random forest](https://en.wikipedia.org/wiki/Random_forest) under the key `myforest` that consists of three trees with IDs ranging from 0 to 2, where each consists of a single numeric splitter and its predicate values. Afterwards, the forest is used to classify two inputs and yield their predictions.
+The following code creates a [random forest](https://en.wikipedia.org/wiki/Random_forest) under the key `myforest` that consists of three trees with IDs ranging from 0 to 2, where each consists of a single numeric splitter and its predicate values. Afterwards, the forest is used to classify two inputs and yield their predictions.
 
 ```
 redis> ML.FOREST.ADD myforst 0 . NUMERIC 1 0.1 .l LEAF 1 .r LEAF 0
@@ -51,7 +51,7 @@ Simple string reply
 ML.FOREST.RUN key sample (CLASSIFICATION|REGRESSION)
 ```
 #### Description
-This command predicts the classified (discrete) or regressed (continuous) value of a sample using the forest.
+Predicts the classified (discrete) or regressed (continuous) value of a sample using the forest.
 The forest that's stored in `key` is used for generating the predicted value for the `sample`. The sample is given as a string that is a vector of attribute-value pairs in the format of `attr:val`. For example,  the `sample` _"gender:male"_ has a single attribute, _gender_, whose value is _male_. A sample may have multiple such attribute-value pairs, and these must be comma-separated (`,`) in the string vector. For example, a sample of a 25-year-old male is expressed as _"gender:male,age:25"_.
 
 #### Return value:
@@ -79,7 +79,7 @@ redis> ML.LINREG.PREDICT linear 1 1 1
 ML.LINREG.SET key intercept coefficient [...]
 ```
 #### Description
-This command sets a linear regression predictor and then creates or updates the linear regression predictor that's stored in `key`. The predictor's intercept is specified by  `intercept`, followed by one or more `coefficient` arguments of the independent variables.
+Sets a linear regression predictor and then creates or updates the linear regression predictor that's stored in `key`. The predictor's intercept is specified by  `intercept`, followed by one or more `coefficient` arguments of the independent variables.
 
 #### Return value:
 Simple string reply
@@ -94,7 +94,7 @@ Simple string reply
 ML.LINREG.PREDICT key feature [...]
 ```
 #### Description
-This command predicts the result for a set of features. The linear regression predictor stored in `key` is used for predicting the result based on one or more features that are provided by the `feature` argument(s).
+Predicts the result for a set of features. The linear regression predictor stored in `key` is used for predicting the result based on one or more features that are provided by the `feature` argument(s).
 
 #### Return value:
 Bulk string reply: the predicted result for the feature set
@@ -122,7 +122,7 @@ redis> ML.LOGREG.PREDICT logistic -3 1
 ML.LOGREG.SET key intercept coefficient [...]
 ```
 #### Description
-This command sets a linear regression predictor and sets or updates the logistic regression predictor that's stored in `key`. The predictor's intercept is specified by  `intercept`, followed by one or more `coefficient` arguments of the independent variables.
+Sets a linear regression predictor and sets or updates the logistic regression predictor that's stored in `key`. The predictor's intercept is specified by  `intercept`, followed by one or more `coefficient` arguments of the independent variables.
 
 #### Return value:
 Simple string reply
@@ -137,7 +137,7 @@ Simple string reply
 ML.LOGREG.PREDICT key feature [...]
 ```
 #### Description
-This command predicts the result for a set of features.
+Predicts the result for a set of features.
 The logistic regression predictor stored in `key` is used for predicting the result based on one or more features that are given by the `feature` argument(s).
 
 #### Return value:
@@ -175,7 +175,7 @@ redis> ML.MATRIX.GET ab
 ML.MATRIX.SET key n m entry11 .. entrynm
 ```
 #### Description
-This command sets `key` to store a matrix of  `n` rows,`m` columns and double-precision float entries ranging from `entry11` to `entrynm`.
+Sets `key` to store a matrix of  `n` rows,`m` columns and double-precision float entries ranging from `entry11` to `entrynm`.
 
 #### Return value:
 
@@ -191,7 +191,7 @@ Simple string reply
 ML.MATRIX.GET key
 ```
 #### Description
-This query returns the matrix's dimensions and entries.
+Returns the matrix's dimensions and entries.
 
 #### Return value:
 The first two elements in the array are the matrix's rows and columns, respectively, followed by the entries.
@@ -206,7 +206,7 @@ The first two elements in the array are the matrix's rows and columns, respectiv
 ML.MATRIX.ADD matrix1 matrix2 sum
 ```
 #### Description
-This command adds matrices.
+Adds matrices.
 The result of adding the two matrices stored in `matrix1` and `matrix2` is set in `sum`.
 
 #### Return value:
@@ -222,7 +222,7 @@ Simple string reply
 ML.MATRIX.MULTIPLY matrix1 matrix2 product
 ```
 #### Description
-This command allows you to multiply matrices.
+Multiplies matrices.
 The result of multiplying the two matrices stored in `matrix1` and `matrix2` is set in `product`.
 
 #### Return value:
@@ -239,7 +239,7 @@ Simple string reply
 ML.MATRIX.SCALE key scalar
 ```
 #### Description
-This command scales a matrix, updating the entries of the matrix stored in `key` by multiplying them with `scalar`.
+Scales a matrix, updating the entries of the matrix stored in `key` by multiplying them with `scalar`.
 
 #### Return value:
 Simple string reply
