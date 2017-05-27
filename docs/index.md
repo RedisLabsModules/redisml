@@ -15,14 +15,14 @@ Redis-ML is a turnkey solution for using trained models in a production environm
 
 ## Building and Running
 
-- Build a Redis server with support for modules (currently available from the [unstable branch](https://github.com/antirez/redis/tree/unstable)).
+1. Build a Redis server with support for modules (currently available from the [unstable branch](https://github.com/antirez/redis/tree/unstable)).
 
-- You'll also need a [BLAS](http://www.netlib.org/blas/) library such as [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
+2. You'll also need a [BLAS](http://www.netlib.org/blas/) library such as [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
 
   - Ubuntu: `sudo apt-get install libatlas-base-dev`
   - CentOS/RHEL/Fedora: `sudo yum install atlas-devel`
 
-- Build the Redis-ML module:
+3. Build the Redis-ML module:
 
   ```sh
   git clone https://github.com/RedisLabsModules/redis-ml.git
@@ -30,7 +30,7 @@ Redis-ML is a turnkey solution for using trained models in a production environm
   make
   ```
 
-- To load the module, start Redis with the `--loadmodule /path/to/redis-ml/src/redis-ml.so` option, add it as a directive to the configuration file or send a `MODULE LOAD` command.
+4. To load the module, start Redis with the `--loadmodule /path/to/redis-ml/src/redis-ml.so` option, add it as a directive to the configuration file or send a `MODULE LOAD` command.
 
 ## Contributing
 
