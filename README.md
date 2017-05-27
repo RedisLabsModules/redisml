@@ -1,12 +1,14 @@
 # Machine Learning Model Server on Redis
 
+## Overview
+
 Redis-ML is a Redis module that implements several machine learning models as Redis data types.
 
 The stored models are fully operational and support performing the prediction/evaluation.
 
 Redis-ML is a turn key solution for using trained models in a production environment. Allowing loading ML models from any platform immediately ready to serve.
 
-The module includes these primary features:
+## Primary Features:
 
 * Decision Tree ensembles (random forests) classification and regression
 * Linear regression
