@@ -2,22 +2,22 @@
 
 Redis-ML is a Redis module that implements several machine learning models as Redis data types.
 
-The stored models are fully operational and support performing the prediction/evaluation.
+The stored models are fully operational and support the prediction/evaluation process.
 
-Redis-ML is a turn key solution for using trained models in a production environment. Allowing loading ML models from any platform immediately ready to serve.
+Redis-ML is a turnkey solution for using trained models in a production environment. Load ML models from any platform, immediately ready to serve.
 
-The module includes these primary features:
+##Primary Features
 
 * Decision Tree ensembles (random forests) classification and regression
 * Linear regression
 * Logistic regression
 * Matrix operations
 
-## Building and running
+## Building and Running
 
 - Build a Redis server with support for modules (currently available from the [unstable branch](https://github.com/antirez/redis/tree/unstable)).
 
-- You'll also need a [BLAS](http://www.netlib.org/blas/) library, for example [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
+- You'll also need a [BLAS](http://www.netlib.org/blas/) library such as [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
 
   - Ubuntu: `sudo apt-get install libatlas-base-dev`
   - CentOS/RHEL/Fedora: `sudo yum install atlas-devel`
@@ -38,7 +38,7 @@ The module includes these primary features:
 
 ### Example of use
 
-The following creates a [random forest](https://en.wikipedia.org/wiki/Random_forest) under the key `myforest` that consists of three trees with ids ranging from 0 to 2, where each consists of a single numeric splitter and its predicate values. Afterwards, the forest is used to classify two inputs and yield their predictions.
+The following code creates a [random forest](https://en.wikipedia.org/wiki/Random_forest) under the key `myforest` that consists of three trees with IDs ranging from 0 to 2, where each consists of a single numeric splitter and its predicate values. Afterwards, the forest is used to classify two inputs and yield their predictions.
 
 ```
 redis> ML.FOREST.ADD myforst 0 . NUMERIC 1 0.1 .l LEAF 1 .r LEAF 0
@@ -64,9 +64,9 @@ ML.FOREST.ADD key tree path ((NUMERIC|CATEGORIC) attr val | LEAF val [STATS]) [.
 ```
 #### Description
 Add nodes to a tree in the forest.
-This command adds one or more nodes to the tree in the forest that's stored under `key`. Trees are identified by numeric ids, `treeid`, that must begin at 0 and incremented by exactly 1 for each new tree. 
+This command adds one or more nodes to the tree in the forest that's stored under `key`. Trees are identified by numeric IDs, `treeid`, that must begin at 0 and be incremented by exactly 1 for each new tree. 
 
-Each of the nodes is described by its path and definition. The `path` argument is the path from the tree's root to the node. A valid path always starts with the period character (`.`), which denotes the root. Optionally, the root may be followed by left or right branches ,denoted by the characters `l` and `r`, respectively. For example, the path _".lr"_ refers to the right child of the root's left child.
+Each of the nodes is described by its path and definition. The `path` argument is the path from the tree's root to the node. A valid path always starts with the period character (`.`), which denotes the root. Optionally, the root may be followed by left or right branches, denoted by the characters `l` and `r`, respectively. For example, the path _".lr"_ refers to the right child of the root's left child.
 
 A node in the decision tree can either be a splitter or a terminal leaf.  Splitter nodes are either numerical or categorical, and are added using the `NUMERIC` or `CATEGORIC` keywords. Splitter nodes also require specifying the examined attribute (`attr`) as well as the value (`val`) used in the comparison made during the branching decision. `val` is expected to be a double-precision floating point value for numerical splitters, and a string for categorical splitter nodes.
 
@@ -86,7 +86,7 @@ ML.FOREST.RUN key sample (CLASSIFICATION|REGRESSION)
 ```
 #### Description
 Predicts the classified (discrete) or regressed (continuous) value of a sample using the forest.
-The forest that's stored in `key` is used for generating the predicted value for the `sample`. The sample is given as a string that is a vector of attribute-value pairs in the format of `attr:val`. For example,  the `sample` _"gender:male"_ has a single attribute, _gender_, whose value is _male_. A sample may have multiple such attribute-value pairs, and these must be comma-separated (`,`) in the string vector. For example, a sample of a 25 years old male is expressed as _"gender:male,age:25"_.
+The forest that's stored in `key` is used for generating the predicted value for the `sample`. The sample is given as a string that is a vector of attribute-value pairs in the format of `attr:val`. For example,  the `sample` _"gender:male"_ has a single attribute, _gender_, whose value is _male_. A sample may have multiple such attribute-value pairs, and these must be comma-separated (`,`) in the string vector. For example, a sample of a 25-years-old male is expressed as _"gender:male,age:25"_.
 
 #### Return value:
 Bulk string reply: the predicted value of the sample
@@ -122,7 +122,7 @@ Simple string reply
 ### ML.LINREG.PREDICT
 
 > **Available since 1.0.0.**  
-> **Time complexity:** O(N) where N is the number features
+> **Time complexity:** O(N) where N is the number of features
 
 #### Syntax
 ```
@@ -167,7 +167,7 @@ Simple string reply
 ### ML.LOGREG.PREDICT
 
 > **Available since 1.0.0.**  
-> **Time complexity:** O(N) where N is the number features
+> **Time complexity:** O(N) where N is the number of features
 
 #### Syntax
 ```
@@ -184,7 +184,7 @@ Bulk string reply: the predicted result for the feature set
 
 #### Example of use
 
-The following example shows how to set two matrices, `a` and `b`, and then multiply them storing the result in the matrix `ab`. Lastly, the contents of `ab` are fetched.
+The following example shows how to set two matrices, `a` and `b`, multiply them, and store the result in the matrix `ab`. Lastly, the contents of `ab` are fetched.
 
 ```
 redis> ML.MATRIX.SET a 2 3 1 2 5 3 4 6
@@ -233,7 +233,7 @@ Get a matrix.
 Returns the matrix's dimensions and entries.
 
 #### Return value:
-Array reply. The first two elements are the matrix's rows and columns, respectively, followed by the entries.
+The first two elements in the returned array are the matrix's rows and columns, respectively, followed by the entries.
 
 ### ML.MATRIX.ADD
 
