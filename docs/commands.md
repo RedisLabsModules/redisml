@@ -122,7 +122,8 @@ redis> ML.LOGREG.PREDICT logistic -3 1
 ML.LOGREG.SET key intercept coefficient [...]
 ```
 #### Description
-Sets a linear regression predictor and sets or updates the logistic regression predictor that's stored in `key`. The predictor's intercept is specified by  `intercept`, followed by one or more `coefficient` arguments of the independent variables.
+Sets a linear regression predictor.
+This command sets or updates the logistic regression predictor that's stored in `key`. The predictor's intercept is specified by  `intercept`, followed by one or more `coefficient` arguments of the independent variables.
 
 #### Return value:
 Simple string reply
@@ -147,7 +148,7 @@ Bulk string reply: the predicted result for the feature set
 
 #### Example of use
 
-The following example shows how to set two matrices, `a` and `b`, multiply them, and storing the result in the matrix `ab`. Lastly, the contents of `ab` are fetched.
+The following example shows how to set two matrices, `a` and `b`, multiply them, and store the result in the matrix `ab`. Lastly, the contents of `ab` are fetched.
 
 ```
 redis> ML.MATRIX.SET a 2 3 1 2 5 3 4 6
