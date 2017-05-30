@@ -4,14 +4,37 @@
 
 RedisModuleType *RegressionType;
 
+/*
+
+typedef struct {
+    double intercept;
+    double *coefficients;
+    int clen;
+} LinReg;
+*/
+
 void *RegressionTypeRdbLoad(RedisModuleIO *io, int encver) {
     if (encver != REGRESSIONTYPE_ENCODING_VERSION) {
         return NULL;
     }
-    return NULL;
+    LinReg *r = malloc(sizeof(LinReg));
+    r->intercept = RedisModule_LoadDouble(io);
+    r->clen = RedisModule_LoadUnsigned(io);
+    r->coefficients = calloc(r->clen, sizeof(double));
+    for(int i = 0; i < r->clen; i++){
+       r->coefficients[i] = RedisModule_LoadDouble(io);
+    }
+    return r; 
 }
 
-void RegressionTypeRdbSave(RedisModuleIO *io, void *ptr) {}
+void RegressionTypeRdbSave(RedisModuleIO *io, void *ptr) {
+    LinReg *r = ptr;
+    RedisModule_SaveDouble(io, r->intercept);
+    RedisModule_SaveUnsigned(io, r->clen);
+    for(int i = 0; i < r->clen; i++){
+       RedisModule_SaveDouble(io, r->coefficients[i]);
+    }
+}
 
 void RegressionTypeAofRewrite(RedisModuleIO *aof, RedisModuleString *key,
                               void *value) {}
