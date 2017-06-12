@@ -3,7 +3,7 @@ compiler: gcc
 dist: trusty
 install: cd src && make clean && make
 before_script:
-- apt get install libatlas-base-dev
+- apt-get install libatlas-base-dev
 - git clone --depth 1 https://github.com/antirez/redis.git
 - cd redis
 - make
