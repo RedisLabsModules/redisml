@@ -12,7 +12,7 @@ before_script:
 env:
 - REDIS_MODULE_PATH=$TRAVIS_BUILD_DIR/src/redis-ml.so REDIS_PATH=$TRAVIS_BUILD_DIR/redis/src/redis-server
 script:
-- make test
+- cd src && make test
   #- make package
 deploy:
   provider: s3
