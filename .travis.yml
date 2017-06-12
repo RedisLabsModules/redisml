@@ -1,7 +1,7 @@
 language: c
 compiler: gcc
 dist: trusty
-install: make clean && make
+install: cd src && make clean && make
 before_script:
 - apt get install libatlas-base-dev
 - git clone --depth 1 https://github.com/antirez/redis.git
