@@ -18,7 +18,7 @@ else
 	SHOBJ_CFLAGS ?= -dynamic -fno-common -g -ggdb
 	SHOBJ_LDFLAGS ?= -bundle -undefined dynamic_lookup
 endif
-CFLAGS = -I$(RM_INCLUDE_DIR) -Wall -g -fPIC -lc -lm -l:libcblas.a -O2 -std=gnu99 -pthread 
+CFLAGS = -I$(RM_INCLUDE_DIR) -Wall -g -fPIC -lc -lm -l:libcblas.a -l:libatlas.a -O2 -std=gnu99 -pthread 
 CC=gcc
 
 OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matrix.o matrix-type.o util/logging.o util/thpool.o
@@ -27,7 +27,7 @@ OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matr
 all: redis-ml.so  
 
 redis-ml.so: rmutil/librmutil.a redis-ml.o $(OBJS)
-	$(LD) -o $@ redis-ml.o $(OBJS) $(SHOBJ_LDFLAGS) -l:libcblas.a $(LIBS) -L$(RMUTIL_LIBDIR) -lrmutil -lc 
+	$(LD) -o $@ redis-ml.o $(OBJS) $(SHOBJ_LDFLAGS) -l:libcblas.a -l:libatlas.a $(LIBS) -L$(RMUTIL_LIBDIR) -lrmutil -lc 
 
 rmutil/librmutil.a:
 	echo "making rmutil" && cd rmutil && $(MAKE) all
