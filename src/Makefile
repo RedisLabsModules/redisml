@@ -50,3 +50,7 @@ test:
 clean:
 	rm -rf *.xo *.so *.o
 
+package: redis-ml.so
+		mkdir -p ../build
+		module_packer -v -o "../build/redis-ml.{os}-{architecture}.latest.zip" "`pwd`/redis-ml.so"
+
