@@ -1,0 +1,28 @@
+language: c
+compiler: gcc
+dist: trusty
+install: 
+- sudo apt-get install libatlas-base-dev 
+- make clean && make
+before_script:
+- git clone --depth 1 https://github.com/antirez/redis.git
+- cd redis
+- make
+- pip install redis ramp-packer rmtest
+- cd ..
+env:
+- REDIS_MODULE_PATH=$TRAVIS_BUILD_DIR/src/redis-ml.so REDIS_PATH=$TRAVIS_BUILD_DIR/redis/src/redis-server
+script:
+- make test
+- make package
+deploy:
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET
+  skip_cleanup: true
+  acl: public_read
+  bucket: redismodules
+  upload-dir: redis-ml
+  on:
+    branch: master
+  local_dir: $TRAVIS_BUILD_DIR/build
