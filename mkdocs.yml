@@ -1,13 +1,12 @@
-site_name: Redis ML Documentation
-site_url: https://redislabsmodules.github.io/redis-ml/
+site_name: Redis-ML - Machine Learning Model Server on Redis
+site_url: https://redisml.io
 repo_url: https://github.com/RedisLabsModules/redis-ml
 repo_name: RedisLabsModules/redis-ml
 theme: material
 
 extra:
   palette:
-    primary: 'grey'
-    accent: 'red'
+    primary: 'indigo'
   logo: 'images/logo.png'
   social:
     - type: 'github'
@@ -18,3 +17,8 @@ extra:
 pages:
     - 'Quickstart': 'index.md'
     - 'Commands': 'commands.md'
+
+markdown_extensions:
+  - admonition
+  - codehilite(guess_lang=false)
+  - toc(permalink=true)
