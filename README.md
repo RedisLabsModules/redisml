@@ -22,7 +22,12 @@ Redis-ML is a turnkey solution for using trained models in a production environm
 - You'll also need a [BLAS](http://www.netlib.org/blas/) library such as [ATLAS](http://math-atlas.sourceforge.net/). To install ATLAS:
 
   - Ubuntu: `sudo apt-get install libatlas-base-dev`
-  - CentOS/RHEL/Fedora: `sudo yum install atlas-devel`
+  - CentOS/RHEL/Fedora: 
+  ```sh
+  sudo yum install -y atlas-devel atlas-static
+  ln -s /usr/lib64/atlas/libatlas.a /usr/lib64/libatlas.a 
+  ln -s /usr/lib64/atlas/libtatlas.so /usr/lib64/libcblas.a 
+  ```
 
 - Build the Redis-ML module:
 
