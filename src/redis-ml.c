@@ -208,6 +208,12 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
             return REDISMODULE_ERR;
         }
     }
+    /*Check tree has no nulls*/
+    if (Forest_CheckTree(t) != FOREST_OK) {
+        RedisModule_DeleteKey(key);
+        return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_NULL_NODES);
+        return REDISMODULE_ERR;
+    }
     /*Normalize tree values*/
     Forest_NormalizeTree(t);
 #ifdef FOREST_USE_FAST_TREE

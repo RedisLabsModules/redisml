@@ -17,6 +17,8 @@ class MLTestCase(ModuleTestCase('../../redis-ml.so')):
             self.assertEqual(r.execute_command('ml.forest.run', 'f_2', '1:1'), '1')
             self.assertOk(r.execute_command('ml.forest.add','f_2', 1 ,'.', 'numeric', 1, 0.5, '.l', 'leaf', 1, 'stats', '0:8', '.r', 'leaf' ,0, 'stats', '5:1'))
             self.assertEqual(r.execute_command('ml.forest.run', 'f_2', '1:1'), '0')
+            with self.assertResponseError():
+                r.execute_command('ml.forest.add','tree-4', '0', '.', 'CATEGORIC', 'country', '1', '.l', 'CATEGORIC', 'us_state', '4', '.ll', 'LEAF', '0', '.lr', 'NUMERIC', 'height_m', '1.6')
     def testMatrix(self):
         with self.redis() as r:
             

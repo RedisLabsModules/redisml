@@ -327,6 +327,32 @@ void Forest_TreeDel(__forest_Node *root) {
     }
 }
 
+static int __checkTree(__forest_Node *root) {
+    if (root == NULL) {
+        printf("root == NULL");
+        return FOREST_ERR;
+    }
+    if (root->type == N_LEAF) {
+        printf("root == LEAF");
+        return FOREST_OK;
+    }
+    if (__checkTree(root->left) == FOREST_ERR){
+        printf("root == LEFT_ERR");
+        return FOREST_ERR;
+    }
+    if (__checkTree(root->right) == FOREST_ERR){
+        printf("root == RIGHT_ERR");
+        return FOREST_ERR;
+    }
+    printf("OK!!!");
+    return FOREST_OK;
+}
+
+
+int Forest_CheckTree(Forest_Tree *t) {
+    return __checkTree(t->root);
+}
+
 static void __normalizeTree(__forest_Node *root, Forest_Tree *t) {
     if (root->type == N_LEAF) {
         t->classCoefficients[(int) root->predVal]++;

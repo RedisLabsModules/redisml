@@ -77,6 +77,8 @@ int Forest_TreeAdd(__forest_Node **root, char *path, __forest_Node *n);
 
 void Forest_GenFastTree (Forest_Tree *t);
 
+int Forest_CheckTree(Forest_Tree *t);
+
 void Forest_NormalizeTree (Forest_Tree *t);
 
 __forest_Node *Forest_TreeGet(__forest_Node *root, char *path);
