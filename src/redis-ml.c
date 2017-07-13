@@ -7,6 +7,8 @@
 #include "feature-vec.h"
 #include "forest.h"
 #include "reg.h"
+#include "kmeans.h"
+#include "kmeans-type.h"
 #include "matrix-type.h"
 #include "forest-type.h"
 #include "regression-type.h"
@@ -227,7 +229,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
 /*
  * Create / Override a linear regression model
- * ml.linreg.load <Id> <intercept> <coefficients ...>
+ * ml.linreg.set <Id> <intercept> <coefficients ...>
  */
 int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (argc < 4) {
@@ -591,6 +593,87 @@ int MatrixTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     return REDISMODULE_OK;
 }
 
+/*================ Kmeans commands ================*/
+
+/*
+ * Create / Override a kmeans regression model
+ * ml.kmeans.set <Id> <k> <dimentions> <center values ...>
+ */
+int KmeansSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+    if (argc < 4) {
+        return RedisModule_WrongArity(ctx);
+    }
+    RedisModule_AutoMemory(ctx);
+    RedisModuleString *id;
+    RMUtil_ParseArgs(argv, argc, 1, "s", &id);
+    RedisModuleKey *key = RedisModule_OpenKey(ctx, id, REDISMODULE_READ | REDISMODULE_WRITE);
+    
+    int k;
+    int dimensions;
+    RMUtil_ParseArgs(argv, argc, 2, "ll", &k, &dimensions);
+    
+    if (k <= 0 || dimensions <= 0 || k * dimensions != argc - 4) {
+        return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+    }
+
+    int type = RedisModule_KeyType(key);
+    if (type != REDISMODULE_KEYTYPE_EMPTY &&
+        RedisModule_ModuleTypeGetType(key) != KmeansType) {
+        return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+    }
+    Kmeans *km = NULL;
+    if (type == REDISMODULE_KEYTYPE_EMPTY) {
+        km = malloc(sizeof(Kmeans));
+        km->k  = 0;
+        km->dimensions = 0;
+        km->centers = NULL;
+        RedisModule_ModuleTypeSetValue(key, KmeansType, km);
+    } else {
+        km = RedisModule_ModuleTypeGetValue(key);
+    }
+    km->k = k;
+    km->dimensions = dimensions;
+    km->centers = realloc(km->centers, k * dimensions * sizeof(double));
+    int argIdx = 4;
+    while (argIdx < argc) {
+        RMUtil_ParseArgs(argv, argc, argIdx, "d", &km->centers[argIdx - 4]);
+        argIdx++;
+    }
+    RedisModule_ReplyWithSimpleString(ctx, "OK");
+    return REDISMODULE_OK;
+}
+
+/*
+* Kmeans predict a class of a feature vector
+* ml.kmeans.predict <id> <features ...>
+*/
+int KmeansPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
+                         int argc) {
+    if (argc < 3) {
+        return RedisModule_WrongArity(ctx);
+    }
+    RedisModule_AutoMemory(ctx);
+
+    Kmeans *km;
+    RedisModuleKey *key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
+    int type = RedisModule_KeyType(key);
+    if (type == REDISMODULE_KEYTYPE_EMPTY ||
+        RedisModule_ModuleTypeGetType(key) != KmeansType) {
+        return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+    }
+    km = RedisModule_ModuleTypeGetValue(key);
+
+    double *features = calloc(km->dimensions, sizeof(double));
+    int argIdx = 2;
+    while (argIdx < argc) {
+        RMUtil_ParseArgs(argv, argc, argIdx, "d", &features[argIdx - 2]);
+        argIdx++;
+    }
+    int rep = KmeansPredict(features, km);
+    RedisModule_ReplyWithLongLong(ctx, rep);
+    return REDISMODULE_OK;
+}
+
 /*Initialize the module*/
 int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 //int RedisModule_OnLoad(RedisModuleCtx *ctx) {
@@ -614,6 +697,12 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     RMUtil_RegisterWriteCmd(ctx, "ml.forest.test", ForestTestCommand);
     RMUtil_RegisterWriteCmd(ctx, "ml.forest.print", ForestPrintCommand);
 
+    /*Register KMEANS data type and commands*/
+    if (KmeansTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
+
+    RMUtil_RegisterWriteCmd(ctx, "ml.kmeans.set",KmeansSetCommand);
+    RMUtil_RegisterReadCmd(ctx, "ml.kmeans.predict", KmeansPredictCommand);
+ 
     /*Register LINREG data type and commands*/
     if (RegressionTypeRegister(ctx) == REDISMODULE_ERR) return REDISMODULE_ERR;
 
@@ -633,7 +722,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     RMUtil_RegisterReadCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
     RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 
-    LOGGING_INIT(L_ERROR);
+    LOGGING_INIT(L_DEBUG);
 
     Forest_thpool = thpool_init(FOREST_NUM_THREADS);
 

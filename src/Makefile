@@ -21,7 +21,7 @@ endif
 CFLAGS = -I$(RM_INCLUDE_DIR) -Wall -g -fPIC -lc -lm -l:libcblas.a -l:libatlas.a -O2 -std=gnu99 -pthread 
 CC=gcc
 
-OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matrix.o matrix-type.o util/logging.o util/thpool.o
+OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matrix.o matrix-type.o kmeans.o kmeans-type.o util/logging.o util/thpool.o
 
 .PHONY: all
 all: redis-ml.so  
@@ -40,6 +40,8 @@ reg.o: reg.h
 regression-type.o: regression-type.h
 matrix.o: matrix.h
 matrix-type.o: matrix-type.h
+kmeans.o: kmeans.h
+kmeans-type.o: kmeans-type.h
 
 .PHONY: test
 test:
