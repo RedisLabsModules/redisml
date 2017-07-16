@@ -244,3 +244,51 @@ Scales a matrix, updating the entries of the matrix stored in `key` by multiplyi
 
 #### Return value:
 Simple string reply
+
+## **K-means**
+
+### Example of use
+Setting up a K-means model in key `k` with 2 clusters and 3 dimensions. The cluster centers are `1, 1, 2` and `2, 5, 4`:
+
+```
+redis> ML.KMEANS.SET k 2 3 1 1 2 2 5 4
+OK
+```
+
+Predicting the cluster of feature vector `1, 3, 5`:
+```
+redis> ML.KMEANS.predict k 1 3 5 
+(integer) 1
+```
+
+### ML.KMEANS.SET
+
+> **Available since 1.0.0.**  
+> **Time complexity:** O(N) where N is the number of coefficients
+
+#### Syntax
+```
+ML.KMEANS.SET key k dimensions centers [...]
+```
+#### Description
+Create/update a K-means model.
+This command creates or updates the K-means model that's stored in `key`. The number of classes is specified by  `k`, the number of features is set by `dimensions` .
+
+#### Return value:
+Simple string reply
+
+### ML.KMEANS.PREDICT
+
+> **Available since 1.0.0.**  
+> **Time complexity:** O(N) where N is the number of features
+
+#### Syntax
+```
+ML.KMEANS.PREDICT key feature [...]
+```
+#### Description
+Predicts the result for a set of features.
+The K-means model stored in `key` is used for predicting the result based on one or more features that are given by the `feature` argument(s).
+
+#### Return value:
+Integer reply: the predicted result for the feature set
