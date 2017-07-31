@@ -722,7 +722,7 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     RMUtil_RegisterReadCmd(ctx, "ml.matrix.print", MatrixPrintCommand);
     RMUtil_RegisterWriteCmd(ctx, "ml.matrix.test", MatrixTestCommand);
 
-    LOGGING_INIT(L_DEBUG);
+    LOGGING_INIT(L_WARN);
 
     Forest_thpool = thpool_init(FOREST_NUM_THREADS);
 
