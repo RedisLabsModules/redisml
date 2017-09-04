@@ -5,7 +5,9 @@
 .cproject                                                                                                                                                                  
 .idea/                                                                                                                                                                     
 .project                                                                                                                                                                   
-.vscode/                                                                                                                                                                   
+.vscode/  
+
+*.dSYM                                                                                                                                                                 
 CMakeLists.txt                                                                                                                                                             
 cmake-build-debug/                                                                                                                                                         
 src/nbproject/                                                                                                                                                             

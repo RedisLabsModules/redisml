@@ -1,5 +1,10 @@
+ifeq ($(uname_S), Darwin)
+CFLAGS = -Wall -g -fPIC -pthread -O2 -std=gnu99
+CC=clang
+else
 CFLAGS = -Wall -g -fPIC -lc -pthread -O2 -std=gnu99
 CC=gcc
+endif
 
 OBJS=../forest.o ../feature-vec.o ../util/logging.o ../util/thpool.o
 

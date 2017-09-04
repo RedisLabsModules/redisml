@@ -36,7 +36,10 @@
  * the include of your alternate allocator if needed (not needed in order
  * to use the default libc allocator). */
 
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
+
 //#include "zmalloc.h"
 #define s_malloc malloc
 #define s_realloc realloc

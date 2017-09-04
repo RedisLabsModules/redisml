@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __APPLE__
+#include <Accelerate/Accelerate.h>
+#else
 #include <cblas.h>
+#endif
 #include "matrix.h"
 
 void Matrix_Multiply(Matrix a, Matrix b, Matrix c) {
