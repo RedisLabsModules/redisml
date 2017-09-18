@@ -3,84 +3,19 @@
 #include <string.h>
 #include <time.h>
 
-#include "feature-vec.h"
 #include "forest.h"
 #include "util/logging.h"
 
-__forest_Node *__newNode(char *splitterAttr) {
+__forest_Node *Forest_NewNode(__forest_NodeType type, int splitterAttr, double val, int *stats, int len) {
     __forest_Node *n = (__forest_Node *) malloc(sizeof(__forest_Node));
-    if (splitterAttr) {
-        n->splitterAttr = malloc(strlen(splitterAttr) + 1);
-        sprintf(n->splitterAttr, "%s", splitterAttr);
-        n->numericSplitterAttr = atoi(splitterAttr);
-    }
-    n->type = N_NODE;
-    n->predVal = 0;
-    n->splitterValLen = 0;
     n->left = NULL;
     n->right = NULL;
-    n->stats = NULL;
-    return n;
-}
-
-__forest_Node *Forest_NewNumericalNode(char *splitterAttr, double sv) {
-    __forest_Node *n = __newNode(splitterAttr);
-    n->splitterType = S_NUMERICAL;
-    n->splitterVal.fval = malloc(sizeof(double));
-    n->splitterVal.fval[0] = sv;
-    return n;
-}
-
-__forest_Node *Forest_NewCategoricalNode(char *splitterAttr, char *sv) {
-    __forest_Node *n = __newNode(splitterAttr);
-    n->splitterType = S_CATEGORICAL;
-    int len = 0;
-    char *str = strdup(sv);
-    char *s2 = strdup(sv);
-    char *v;
-    while ((v = strsep(&str, ":"))) len++;
-    LG_DEBUG("adding splitter: %s, len: %d", sv, len);
-    n->splitterVal.fval = calloc(len, sizeof(double));
-    len = 0;
-    while ((v = strsep(&s2, ":"))) {
-        n->splitterVal.fval[len] = atof(v);
-        LG_DEBUG("fval[%d]: %lf", len, n->splitterVal.fval[len]);
-        len++;
-    }
-    n->splitterValLen = len;
-    return n;
-}
-
-__forest_Node *Forest_NewLeaf(double predVal, char* stats) {
-    __forest_Node *n = __newNode(NULL);
-    n->type = N_LEAF;
-    int len = 0;
-    int total = 0;
-    if(stats){
-        char *str = strdup(stats);
-        char *s2 = strdup(stats);
-        char *v;
-        while ((v = strsep(&str, ":"))) {
-            len++;
-            total += atoi(v);
-        }
-        LG_DEBUG("adding stats: %s, len: %d", stats, len);
-        n->stats = calloc(len, sizeof(double));
-        len = 0;
-        while ((v = strsep(&s2, ":"))) {
-            n->stats[len] = (double)atoi(v);
-            LG_DEBUG("stats[%d]: %.3lf", len, n->stats[len]);
-            len++;
-        }
-    }else{
-        len = (int)predVal + 1;
-        total = 1; 
-        n->stats = calloc(len ,sizeof(double));
-        n->stats[len-1] = 1;
-    }
-    n->statsTotal = total;
+    n->stats = calloc(len, sizeof(int));
+    memcpy(n->stats, stats, len);
     n->statsLen = len;
-    n->predVal = predVal;
+    n->type = type;
+    n->splitterAttr = splitterAttr;
+    n->splitterVal = val;
     return n;
 }
 
@@ -104,38 +39,6 @@ int Forest_TreeAdd(__forest_Node **root, char *path, __forest_Node *n) {
     return FOREST_ERR;
 }
 
-static int fastIndex;
-
-static void __forest_GenFastTree(__forest_Node *root, Forest_Tree *t, int parent, int isLeft) {
-    if (root != NULL) {
-        fastIndex++;
-        int nextParent = fastIndex;
-        t->fastTree[fastIndex].key = root->numericSplitterAttr;
-        t->fastTree[fastIndex].val = root->splitterVal.fval[0];
-        t->fastTree[fastIndex].left = -1;
-        t->fastTree[fastIndex].right = -1;
-        //        LG_DEBUG("index: %d\n", fastIndex);
-        if (parent >= 0) {
-            if (isLeft) {
-                t->fastTree[parent].left = fastIndex;
-                //                LG_DEBUG("t[%d].left = %d\n", parent, fastIndex);
-            } else {
-                t->fastTree[parent].right = fastIndex;
-                //                LG_DEBUG("t[%d].right = %d\n", parent, fastIndex);
-            }
-        }
-        __forest_GenFastTree(root->left, t, nextParent, 1);
-        __forest_GenFastTree(root->right, t, nextParent, 0);
-    }
-}
-
-void Forest_GenFastTree(Forest_Tree *t) {
-    //    LG_DEBUG("gen_fast\n");
-    fastIndex = -1;
-    t->fastTree = malloc(sizeof(__fast_Node) * 1024);
-    __forest_GenFastTree(t->root, t, -1, 0);
-}
-
 __forest_Node *Forest_TreeGet(__forest_Node *root, char *path) {
     if (root == NULL) {
         return NULL;
@@ -156,14 +59,10 @@ __forest_Node *Forest_TreeGet(__forest_Node *root, char *path) {
 }
 
 static void printNode(__forest_Node *n) {
-    if (n->type == N_NODE) {
-        if (n->splitterType == S_NUMERICAL) {
-            LG_DEBUG("split=%s:%.2lf\n", n->splitterAttr, n->splitterVal.fval[0]);
-        } else if (n->splitterType == S_CATEGORICAL) {
-            LG_DEBUG("split=%s:%s\n", n->splitterAttr, n->splitterVal.strval);
-        }
+    if (n->type != N_LEAF) {
+            LG_DEBUG("split=%d:%.2lf\n", n->splitterAttr, n->splitterVal);
     } else if (n->type == N_LEAF) {
-        LG_DEBUG("pred=%.2lf\n", n->predVal);
+        LG_DEBUG("LEAF\n");
     }
 }
 
@@ -186,21 +85,10 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
     }
     long int pathSize = plen / 8 + (plen % 8 ? 1 : 0);
     LG_DEBUG("******\npathSize: %ld\n", pathSize);
-    size_t splitterSize = 0;
-    size_t splitteAttrLen = 0;
-    size_t statsLen = 0;
-    size_t statsSize = 0;
-    if (root->type != N_LEAF) {
-        if (root->splitterType == S_NUMERICAL) {
-            splitterSize = sizeof(double);
-        } else if (root->splitterType == S_CATEGORICAL) {
-            splitterSize = strlen(root->splitterVal.strval) + 1;
-        }
-        splitteAttrLen = strlen(root->splitterAttr) + 1 + sizeof(__forest_SplitterType);
-    } else {
-        statsLen = root->statsLen;
-        statsSize = statsLen * sizeof(double) + sizeof(int) + sizeof(int);
-    }
+    size_t splitterSize = sizeof(double);
+    size_t splitteAttrLen = sizeof(int);
+    int statsLen = root->statsLen;
+    int statsSize = statsLen * sizeof(int);
 
     len += sizeof(int) + pathSize + 1 + sizeof(double) + splitteAttrLen +
         splitterSize  + statsSize;
@@ -223,40 +111,6 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
     *(s + pos) = (char) root->type;
     pos++;
 
-    *((double *) (s + pos)) = root->predVal;
-    pos += sizeof(double);
-
-    LG_DEBUG("pos: %d, len: %d\n", pos, len);
-    if (root->type != N_LEAF) {
-        strcpy(s + pos, root->splitterAttr);
-        pos += strlen(root->splitterAttr) + 1;
-
-        *((__forest_SplitterType *) (s + pos)) = root->splitterType;
-        pos += sizeof(__forest_SplitterType);
-
-        if (root->splitterType == S_NUMERICAL) {
-            *((double *) (s + pos)) = root->splitterVal.fval[0];
-            pos += sizeof(double);
-        } else if (root->splitterType == S_CATEGORICAL) {
-            strcpy(s + pos, root->splitterVal.strval);
-            pos += strlen(root->splitterVal.strval) + 1;
-        }
-
-        LG_DEBUG("pos: %d, len: %d\n", pos, len);
-        char nextpath = *path << 1;
-        len = Forest_TreeSerialize(dst, root->left, &nextpath, plen + 1, len);
-        nextpath |= 1;
-        len = Forest_TreeSerialize(dst, root->right, &nextpath, plen + 1, len);
-    } else {
-        *((int *) (s + pos)) = root->statsLen;
-        pos += sizeof(int);
-        *((int *) (s + pos)) = root->statsTotal;
-        pos += sizeof(int);
-        for(int i=0; i < statsLen; i++){
-            *((double *) (s + pos)) = root->stats[i];
-            pos += sizeof(double);
-        }
-    }
     return len;
 }
 
@@ -284,35 +138,7 @@ void Forest_TreeDeSerialize(char *s, __forest_Node **root, int slen) {
         pos += sizeof(double);
 
         __forest_Node *n = NULL;
-        if (type != N_LEAF) {
-            char *splitterAttr = s + pos;
-            pos += strlen(splitterAttr) + 1;
-
-            __forest_SplitterType splitterType = (__forest_SplitterType) *(s + pos);
-            pos += sizeof(__forest_SplitterType);
-
-            if (splitterType == S_NUMERICAL) {
-                LG_DEBUG("numerical: %lf\n", *((double *) (s + pos)));
-                n = Forest_NewNumericalNode(splitterAttr, *((double *) (s + pos)));
-                pos += sizeof(double);
-            } else if (splitterType == S_CATEGORICAL) {
-                LG_DEBUG("categorical: %s\n", s + pos);
-                n = Forest_NewCategoricalNode(splitterAttr, s + pos);
-                pos += strlen(s + pos) + 1;
-            }
-        } else {
-            n = Forest_NewLeaf(predVal, "");
-            n->statsLen = *((int *) (s + pos));
-            pos += sizeof(int);
-            n->statsTotal = *((int *) (s + pos));
-            pos += sizeof(int);
-            n->stats = calloc(n->statsLen, sizeof(double));
-            for(int i = 0; i < n->statsLen; i++){
-                n->stats[i] = *((double *) (s + pos));
-                pos += sizeof(double);
-            }
-        }
-        Forest_TreeAdd(root, path, n);
+       Forest_TreeAdd(root, path, n);
         LG_DEBUG("last pos: %d\n", pos);
     }
 }
@@ -348,40 +174,19 @@ int Forest_CheckTree(Forest_Tree *t) {
     return __checkTree(t->root);
 }
 
-static void __normalizeTree(__forest_Node *root, Forest_Tree *t) {
-    if (root->type == N_LEAF) {
-        t->classCoefficients[(int) root->predVal]++;
-        t->numClasses++;
-        return;
-    }
-    __normalizeTree(root->left, t);
-    __normalizeTree(root->right, t);
-}
-
-void Forest_NormalizeTree(Forest_Tree *t) {
-    t->numClasses = 0;
-    t->classCoefficients = calloc(FOREST_MAX_CLASSES, sizeof(double));
-    __normalizeTree(t->root, t);
-    for (int i = 0; i < FOREST_MAX_CLASSES; ++i) {
-        t->classCoefficients[i] /= t->numClasses;
-    }
-}
-
-
-__forest_Node *Forest_TreeClassify(FeatureVec *fv, __forest_Node *root) {
+__forest_Node *Forest_TreeClassify(double *fv, __forest_Node *root) {
     if (root == NULL) {
         LG_DEBUG("Forest_TreeClassify reached NULL node\n");
         return NULL;
     }
     if (root->type == N_LEAF) {
-        LG_DEBUG("leaf: %lf", root->predVal);
         return root;
     }
     double attrVal;
     //    if (root->numericSplitterAttr) {
-    //        attrVal = FeatureVec_NumericGetValue(fv, root->numericSplitterAttr);
+    //        attrVal = double_NumericGetValue(fv, root->numericSplitterAttr);
     //    } else {
-    attrVal = FeatureVec_GetValue(fv, root->splitterAttr);
+    attrVal = double_GetValue(fv, root->splitterAttr);
     LG_DEBUG("splitter: %s,%lf len:%d", root->splitterAttr, attrVal, root->splitterValLen);
     for (int i = 0; i < root->splitterValLen; ++i) {
         LG_DEBUG("spliter[%d]: %lf", i, root->splitterVal.fval[i]);
@@ -404,24 +209,6 @@ __forest_Node *Forest_TreeClassify(FeatureVec *fv, __forest_Node *root) {
     }
 }
 
-
-double Forest_FastTreeClassify(FeatureVec *fv, Forest_Tree *t) {
-    //    LG_DEBUG("fast_classify\n");
-    int i = 0;
-    while (t->fastTree[i].left > 0 || t->fastTree[i].right > 0) {
-        double attrVal;
-        attrVal = FeatureVec_NumericGetValue(fv, t->fastTree[i].key);
-        //        LG_DEBUG("i=%lf\n",attrVal);
-        if (attrVal <= t->fastTree[i].val) {
-            i = t->fastTree[i].left;
-        } else {
-            i = t->fastTree[i].right;
-        }
-        //        LG_DEBUG("i=%d\n",i);
-    }
-    return t->fastTree[i].val;
-}
-
 /*2D array comperator for the qsort*/
 static int cmp2D(const void *p1, const void *p2) {
     return (int) (((const double *) p2)[1] - ((const double *) p1)[1]);
@@ -430,7 +217,7 @@ static int cmp2D(const void *p1, const void *p2) {
 typedef struct {
     double *res;
     Forest *f;
-    FeatureVec *fv;
+    double *fv;
     int skip;
 } taskArgs;
 
@@ -452,7 +239,7 @@ static void classifierTask(void *id){
 /*Classify a feature vector with a full forest.
  * classification: majority voting of the trees.
  * regression: avg of the votes.*/
-double Forest_Classify(FeatureVec fv, Forest *f, int classification) {
+double Forest_Classify(double fv, Forest *f, int classification) {
     double threadResults[FOREST_MAX_CLASSES * FOREST_NUM_THREADS];
     memset(threadResults, 0, FOREST_MAX_CLASSES * FOREST_NUM_THREADS * sizeof(double));
     double results[FOREST_MAX_CLASSES][2] = {{0}};
@@ -538,9 +325,9 @@ void Forest_TreeTest() {
          (double) (end.tv_nsec - start.tv_nsec) / 1.0e6);
     LG_DEBUG("create elapsed: %lf\n", ms);
 
-    FeatureVec fv = {0, NULL};
+    double fv = {0, NULL};
     char *data = "1:0,2:1,3:0";
-    FeatureVec_Create(data, &fv);
+    double_Create(data, &fv);
     clock_gettime(CLOCK_REALTIME, &start);
 
     Forest_Classify(fv, &f, 1);
