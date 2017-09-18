@@ -89,9 +89,48 @@ int ForestPrintCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     return REDISMODULE_OK;
 }
 
+
+
 /*
- * rediforest.ADD <forestId> <treeId> <path> [[NUMERIC|CATEGORIC] <splitterAttr>
- * <splitterVal] | [LEAF] <predVal> <stats>]
+ * ML.FOREST.INIT <forestId> <nClasses>
+ */
+int ForestInitCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+    if (argc != 3) {
+        return RedisModule_WrongArity(ctx);
+    }
+    RedisModule_AutoMemory(ctx);
+
+    RedisModuleString *fid;
+    int nClasses;
+    int nFeatures;
+    RMUtil_ParseArgs(argv, argc, 1, "sll", &fid, &nClasses, &nFeatures);
+    RedisModuleKey *key = RedisModule_OpenKey(ctx, fid, REDISMODULE_READ | REDISMODULE_WRITE);
+
+    int type = RedisModule_KeyType(key);
+    if (type != REDISMODULE_KEYTYPE_EMPTY &&
+        RedisModule_ModuleTypeGetType(key) != ForestType) {
+        return RedisModule_ReplyWithError(ctx, REDISMODULE_ERRORMSG_WRONGTYPE);
+    }
+
+    Forest *f;
+    if (type == REDISMODULE_KEYTYPE_EMPTY) {
+        f = malloc(sizeof(Forest));
+        f->len = 0;
+        f->Trees = NULL;
+        f->nClasses = nClasses;
+        f->nFeatures = nFeatures;
+        RedisModule_ModuleTypeSetValue(key, ForestType, f);
+    } else {
+        return RedisModule_ReplyWithError(ctx, REDIS_ML_FOREST_ERROR_FOREST_EXIST);
+    }
+
+    RedisModule_ReplyWithSimpleString(ctx, "OK");
+    return REDISMODULE_OK;
+}
+
+/*
+ * ML.FOREST.ADD <forestId> <treeId> <path> <[<NUMERIC|CATEGORIC> <splitterAttr>
+ * <splitterVal>] | [LEAF]> <stats>
  */
 int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (argc < 6) {
