@@ -1,6 +1,5 @@
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
@@ -60,10 +59,10 @@ int __vector_PushPtr(Vector *v, void *elem);
 int Vector_Resize(Vector *v, size_t newcap);
 
 /* return the used size of the vector, regardless of capacity */
-inline int Vector_Size(Vector *v) { return v->top; }
+int Vector_Size(Vector *v);
 
 /* return the actual capacity */
-inline int Vector_Cap(Vector *v) { return v->cap; }
+int Vector_Cap(Vector *v);
 
 /* free the vector and the underlying data. Does not release its elements if
  * they are pointers*/

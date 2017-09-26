@@ -15,15 +15,14 @@
                         return REDISMODULE_ERR;\
                     }\
                 }
-
-
+           
+                
 #define RMUtil_Assert(expr) if (!(expr)) { fprintf (stderr, "Assertion '%s' Failed\n", __STRING(expr)); return REDISMODULE_ERR; }
 
 #define RMUtil_AssertReplyEquals(rep, cstr) RMUtil_Assert( \
             RMUtil_StringEquals(RedisModule_CreateStringFromCallReply(rep), RedisModule_CreateString(ctx, cstr, strlen(cstr))) \
             )
 #            
-
 
 /**
 * Create an arg list to pass to a redis command handler manually, based on the format in fmt.
@@ -37,20 +36,20 @@
 *  Returns an array of RedisModuleString pointers. The size of the array is store in argcp
 */
 RedisModuleString **RMUtil_MakeArgs(RedisModuleCtx *ctx, int *argcp, const char *fmt, ...) {
-
+    
     va_list ap;
     va_start(ap, fmt);
-    RedisModuleString **argv = calloc(strlen(fmt), sizeof(RedisModuleString *));
+    RedisModuleString **argv = calloc(strlen(fmt), sizeof(RedisModuleString*));
     int argc = 0;
     const char *p = fmt;
-    while (*p) {
+    while(*p) {
         if (*p == 'c') {
-            char *cstr = va_arg(ap, char*);
+            char *cstr = va_arg(ap,char*);
             argv[argc++] = RedisModule_CreateString(ctx, cstr, strlen(cstr));
         } else if (*p == 's') {
-            argv[argc++] = va_arg(ap, void*);;
+            argv[argc++] = va_arg(ap,void*);;
         } else if (*p == 'l') {
-            long ll = va_arg(ap, long long);
+            long ll = va_arg(ap,long long);
             argv[argc++] = RedisModule_CreateStringFromLongLong(ctx, ll);
         } else {
             goto fmterr;
@@ -58,9 +57,9 @@ RedisModuleString **RMUtil_MakeArgs(RedisModuleCtx *ctx, int *argcp, const char 
         p++;
     }
     *argcp = argc;
-
+    
     return argv;
-    fmterr:
+fmterr:
     free(argv);
     return NULL;
 }
