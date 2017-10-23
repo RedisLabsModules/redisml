@@ -63,6 +63,8 @@ typedef struct {
 } Forest_Tree;
 
 typedef struct {
+    int nClasses;
+    int nFeatures;
     size_t len;
     Forest_Tree **Trees;
 } Forest;

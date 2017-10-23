@@ -8,6 +8,8 @@
 #define FORESTTYPE_NAME "RLML_FRST"
 
 #define REDIS_ML_FOREST_ERROR_NULL_NODES "Tree contains null nodes" 
+#define REDIS_ML_FOREST_ERROR_FOREST_EXIST "Can not create an existing forest" 
+#define REDIS_ML_FOREST_ERROR_EMPTY_FOREST "Forest key does not exist. Use FOREST.CREATE" 
 #define REDIS_ML_FOREST_ERROR_WRONG_PATH "Tree node path containes wrong characters, should be \'r\' or \'l\'"
 #define REDIS_ML_FOREST_ERROR_WRONG_SPLIT_TYPE "Wrong node type , should be \'NUMERIC\', \'CATEGORIC\' or \'LEAF\'"
 
