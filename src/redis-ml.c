@@ -222,6 +222,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     Forest_GenFastTree(t);
 #endif
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -265,6 +266,7 @@ int LinRegSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         argIdx++;
     }
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -371,6 +373,7 @@ int MatrixSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         argIdx++;
     }
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -405,6 +408,7 @@ int MatrixUpdateCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
     RMUtil_ParseArgs(argv, argc, 4, "d", &val);
     m->values[row * col] = val;
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -459,6 +463,7 @@ int MatrixMultiplyCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     c->values = realloc(c->values, c->cols * c->rows * sizeof(double));
     Matrix_Multiply(*a, *b, *c);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -512,6 +517,7 @@ int MatrixAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     c->values = realloc(c->values, c->cols * c->rows * sizeof(double));
     Matrix_Add(*a, *b, *c);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -537,6 +543,7 @@ int MatrixScaleCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
     RMUtil_ParseArgs(argv, argc, 2, "d", &n);
     Matrix_Scale(*m, n);
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
@@ -640,6 +647,7 @@ int KmeansSetCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         argIdx++;
     }
     RedisModule_ReplyWithSimpleString(ctx, "OK");
+    RedisModule_ReplicateVerbatim(ctx);
     return REDISMODULE_OK;
 }
 
