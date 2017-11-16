@@ -13,9 +13,10 @@
 #include "forest-type.h"
 #include "regression-type.h"
 #include "util/thpool.h"
+#include "version.h"
 
 #define RLMODULE_NAME "REDIS-ML"
-#define RLMODULE_VERSION "1.0.0"
+#define RLMODULE_DESC "Machine learning model server on Redis"
 
 #define REDIS_ML_ERROR_GENERIC "ERR Generic"
 
