@@ -6,9 +6,9 @@
 # The relative path to the RAMP manifest
 RAMP_MANIFEST = ramp.yml
 # The command to execute RAMP
-RAMP_COMMAND = ramp-packer -m $(RAMP_MANIFEST)
+RAMP_COMMAND = ramp-packer -v -m $(RAMP_MANIFEST)
 # The module's product name, to be part of the URL
-MODULE_NAME = redisml
+MODULE_NAME = redis-ml
 # The output directory where the packages go
 BUILD_DIR = ../build
 
