@@ -25,6 +25,8 @@ CC=gcc
 
 OBJS=rmalloc.o forest.o forest-type.o feature-vec.o reg.o regression-type.o matrix.o matrix-type.o kmeans.o kmeans-type.o util/logging.o util/thpool.o
 
+MODULE_ARTIFACT=redis-ml.so
+
 .PHONY: all
 all: redis-ml.so  
 
@@ -54,7 +56,4 @@ test:
 clean:
 	rm -rf *.xo *.so *.o
 
-package: redis-ml.so
-		mkdir -p ../build
-		module_packer -v -o "../build/redis-ml.{os}-{architecture}.latest.zip" "`pwd`/redis-ml.so"
-
+include Makefile.package
