@@ -687,7 +687,7 @@ int KmeansPredictCommand(RedisModuleCtx *ctx, RedisModuleString **argv,
 int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 //int RedisModule_OnLoad(RedisModuleCtx *ctx) {
     /* Register the module itself*/
-    if (RedisModule_Init(ctx, "redis-ml", 1, REDISMODULE_APIVER_1) ==
+    if (RedisModule_Init(ctx, "redis-ml", REDISML_MODULE_VERSION, REDISMODULE_APIVER_1) ==
         REDISMODULE_ERR) {
         return REDISMODULE_ERR;
     }
