@@ -1,3 +1,6 @@
+#ifdef USE_BLAS
+#include <cblas.h>
+#endif
 #include "matrix.h"
 
 #define MATRIX(m,i,j) m->values[(i) * m->cols + j]
@@ -48,8 +51,11 @@ int Matrix_IsEqual(Matrix *a, Matrix *b) {
 
 void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c) {
     Matrix *bt = Matrix_New(b->cols, b->rows);
+#ifdef USE_BLAS
+    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, a->rows, b->cols, a->cols,
+        1, a->values, a->cols, b->values, b->cols, 0, c->values, b->cols);
+#else
     Matrix_Transpose(b, bt);
-    Matrix_Print(bt);
     for (int ai = 0; ai < a->rows; ai++) {
        for (int bti = 0; bti < a->rows; bti++) {
           for (int j = 0; j < a->cols; j++) {
@@ -57,4 +63,5 @@ void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c) {
           }
        }
     }
+#endif
 } 

@@ -1,5 +1,8 @@
-CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./ 
+ifeq ($(USE_BLAS), 1) 
+	BLAS_FLAGS = -l:libcblas.a -l:libatlas.a -lpthread -DUSE_BLAS
+endif
 
+CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./
 CC=gcc
 
 SOURCEDIR=$(abspath $(shell pwd -P)/../)
@@ -11,16 +14,19 @@ TEST_OBJECTS = $(patsubst %.c, %.o, $(TEST_SOURCES))
 TEST_EXECUTABLES = $(patsubst %.c, %.run, $(TEST_SOURCES))
 
 %.o: %.c
-		$(CC) $(CFLAGS) -c $< -o $@ 
+		$(CC) $(CFLAGS) $(BLAS_FLAGS) -c $< -o $@ 
 
 %.run: %.c
-		$(CC) $(CFLAGS) $(OBJS) $< -o $@ -DTEST
+		$(CC) $(CFLAGS) $(OBJS) $< -o $@ -DTEST $(BLAS_FLAGS)
 
 all: objs build test
 
 objs:
-	$(MAKE) -C ../ all
-
+ifeq ($(USE_BLAS), 1) 
+	$(MAKE) -C ../ clean USE_BLAS=1 all
+else
+	$(MAKE) -C ../ clean all
+endif
 build: $(TEST_EXECUTABLES)
 
 test: build $(TEST_EXECUTABLES)

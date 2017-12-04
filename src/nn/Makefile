@@ -1,5 +1,8 @@
-CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./ 
+ifeq ($(USE_BLAS), 1) 
+	BLAS_FLAGS = -l:libcblas.a -l:libatlas.a -DUSE_BLAS
+endif
 
+CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./
 CC=gcc
 
 SOURCEDIR=$(abspath $(shell pwd -P)/.)
@@ -7,7 +10,7 @@ C_SOURCES = $(wildcard $(SOURCEDIR)/*.c)
 OBJS = $(patsubst %.c, %.o, $(C_SOURCES) )
 
 %.o: %.c %.h
-		$(CC) $(CFLAGS) -c $< -o $@ 
+		$(CC) $(CFLAGS) $(BLAS_FLAGS) -c $< -o $@ 
 
 
 all: $(OBJS)
