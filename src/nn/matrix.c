@@ -3,7 +3,6 @@
 #endif
 #include "matrix.h"
 
-#define MATRIX(m,i,j) m->values[(i) * m->cols + j]
 
 Matrix *Matrix_New(size_t rows, size_t cols) {
     Matrix *m = malloc(sizeof(Matrix));
@@ -65,4 +64,12 @@ void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c) {
     }
     Matrix_Free(bt);
 #endif
-} 
+}
+
+void Matrix_Add(Matrix *a, Matrix *b, Matrix *c) {
+    for (int i = 0; i < a->rows * a->cols; i++) {
+        c->values[i] = a->values[i] + b->values[i];
+    }
+}
+
+ 
