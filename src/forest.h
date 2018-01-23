@@ -95,7 +95,9 @@ __forest_Node *Forest_TreeClassify(FeatureVec *fv, __forest_Node *root);
 
 double Forest_Classify(FeatureVec fv, Forest *f, int classification);
 
-void Forest_TreeTest();
+int Forest_TreeTest();
+
+int Forest_DeepTreeTest();
 
 #endif  /* __FOREST_H__ */
 

@@ -216,7 +216,10 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
     pos += sizeof(int);
 
     if (plen) {
-        *(s + pos) = *path;
+//        *(s + pos) = *path;
+        for (int i=0; i<pathSize; i++) {
+            *(s + pos + i) = *(path + i);
+        }
         pos += pathSize;
     }
 
@@ -243,10 +246,38 @@ int Forest_TreeSerialize(char **dst, __forest_Node *root, char *path, int plen, 
         }
 
         LG_DEBUG("pos: %d, len: %d\n", pos, len);
-        char nextpath = *path << 1;
-        len = Forest_TreeSerialize(dst, root->left, &nextpath, plen + 1, len);
-        nextpath |= 1;
-        len = Forest_TreeSerialize(dst, root->right, &nextpath, plen + 1, len);
+
+        // if we'll need another byte for the next path, increment pathSize
+        if (plen > 0 && plen % 8 == 0) {
+            pathSize += 1;
+        }
+        char *nextpath = malloc(pathSize);
+        for (int i=0; i<pathSize; i++) {
+            *(nextpath + i) = *(path + i) << 1;
+            if (i > 0) {
+                *(nextpath + i) |= (*(path + i - 1) & 0x80) >> 7;
+            }
+        }
+        len = Forest_TreeSerialize(dst, root->left, nextpath, plen + 1, len);
+        if (len == 0) {
+            LG_DEBUG("left 0 len, pathlen = %d: ", plen);
+            char printpath = *path;
+            for (int i=0; i<plen; i++) {
+              LG_DEBUG(printpath & 1 ? "r" : "l");
+              printpath = printpath >> 1;
+            }
+        }
+        *nextpath |= 1;
+        len = Forest_TreeSerialize(dst, root->right, nextpath, plen + 1, len);
+        if (len == 0) {
+            LG_DEBUG("right 0 len, pathlen = %d: ", plen);
+            char printpath = *path;
+            for (int i=0; i<plen; i++) {
+              LG_DEBUG(printpath & 1 ? "r" : "l");
+              printpath = printpath >> 1;
+            }
+        }
+        free(nextpath);
     } else {
         *((int *) (s + pos)) = root->statsLen;
         pos += sizeof(int);
@@ -516,7 +547,7 @@ static void __forest_genSubTree(__forest_Node **root, char *path, int depth) {
     __forest_genSubTree(root, rpath, depth - 1);
 }
 
-void Forest_TreeTest() {
+int Forest_TreeTest() {
     struct timespec end, start;
     double ms;
     clock_gettime(CLOCK_REALTIME, &start);
@@ -551,7 +582,10 @@ void Forest_TreeTest() {
          (double) (end.tv_nsec - start.tv_nsec) / 1.0e6);
     LG_DEBUG("classify elapsed: %lf\n", ms);
 
-    return;
+    return FOREST_OK;
+}
+
+int Forest_DeepTreeTest() {
 
     Forest_Tree t = {.root = NULL};
     __forest_genSubTree(&t.root, ".", 6);
@@ -560,26 +594,86 @@ void Forest_TreeTest() {
     LG_DEBUG("2***2\n");
 
 
-    __forest_Node *n1 = Forest_NewNumericalNode("1", 1.0);
-    __forest_Node *n2 = Forest_NewNumericalNode("2", 2.0);
-    __forest_Node *n3 = Forest_NewNumericalNode("3", 3.0);
-    __forest_Node *n4 = Forest_NewNumericalNode("4", 4.0);
+    __forest_Node *n1 = Forest_NewNumericalNode("n1", 1.0);
+    __forest_Node *n2 = Forest_NewNumericalNode("n2", 2.0);
+    __forest_Node *n3 = Forest_NewNumericalNode("n3", 3.0);
+    __forest_Node *n4 = Forest_NewNumericalNode("n4", 4.0);
+    __forest_Node *n5 = Forest_NewNumericalNode("n5", 5.0);
+    __forest_Node *n6 = Forest_NewNumericalNode("n6", 6.0);
+    __forest_Node *n7 = Forest_NewNumericalNode("n7", 7.0);
+    __forest_Node *n8 = Forest_NewNumericalNode("n8", 8.0);
+    __forest_Node *n9 = Forest_NewNumericalNode("n9", 9.0);
+    __forest_Node *n10 = Forest_NewNumericalNode("n10", 10.0);
+    __forest_Node *n11 = Forest_NewNumericalNode("n11", 11.0);
+    __forest_Node *n12 = Forest_NewNumericalNode("n12", 12.0);
+    __forest_Node *n13 = Forest_NewNumericalNode("n13", 13.0);
+    __forest_Node *n14 = Forest_NewNumericalNode("n14", 14.0);
+    __forest_Node *n15 = Forest_NewNumericalNode("n15", 15.0);
+    __forest_Node *n16 = Forest_NewNumericalNode("n16", 16.0);
+    __forest_Node *n17 = Forest_NewNumericalNode("n17", 17.0);
+    __forest_Node *n18 = Forest_NewNumericalNode("n18", 18.0);
+    __forest_Node *n19 = Forest_NewNumericalNode("n19", 19.0);
 
-    __forest_Node *n5 = Forest_NewLeaf(5.0, "");
-    __forest_Node *n6 = Forest_NewLeaf(6.0, "");
-    __forest_Node *n7 = Forest_NewLeaf(7.0, "");
-    __forest_Node *n8 = Forest_NewLeaf(8.0, "");
-    __forest_Node *n9 = Forest_NewLeaf(9.0, "");
+    __forest_Node *l1 = Forest_NewLeaf(1.0, "");
+    __forest_Node *l2 = Forest_NewLeaf(2.0, "");
+    __forest_Node *l3 = Forest_NewLeaf(3.0, "");
+    __forest_Node *l4 = Forest_NewLeaf(4.0, "");
+    __forest_Node *l5 = Forest_NewLeaf(5.0, "");
+    __forest_Node *l6 = Forest_NewLeaf(6.0, "");
+    __forest_Node *l7 = Forest_NewLeaf(7.0, "");
+    __forest_Node *l8 = Forest_NewLeaf(8.0, "");
+    __forest_Node *l9 = Forest_NewLeaf(9.0, "");
+    __forest_Node *l10 = Forest_NewLeaf(10.0, "");
+    __forest_Node *l11 = Forest_NewLeaf(11.0, "");
+    __forest_Node *l12 = Forest_NewLeaf(12.0, "");
+    __forest_Node *l13 = Forest_NewLeaf(13.0, "");
+    __forest_Node *l14 = Forest_NewLeaf(14.0, "");
+    __forest_Node *l15 = Forest_NewLeaf(15.0, "");
+    __forest_Node *l16 = Forest_NewLeaf(16.0, "");
+    __forest_Node *l17 = Forest_NewLeaf(17.0, "");
+    __forest_Node *l18 = Forest_NewLeaf(18.0, "");
+    __forest_Node *l19 = Forest_NewLeaf(19.0, "");
+    __forest_Node *l20 = Forest_NewLeaf(20.0, "");
 
     Forest_TreeAdd(&t.root, ".", n1);
     Forest_TreeAdd(&t.root, ".l", n2);
     Forest_TreeAdd(&t.root, ".r", n3);
-    Forest_TreeAdd(&t.root, ".rl", n8);
-    Forest_TreeAdd(&t.root, ".rr", n9);
-    Forest_TreeAdd(&t.root, ".ll", n4);
-    Forest_TreeAdd(&t.root, ".lr", n7);
-    Forest_TreeAdd(&t.root, ".lll", n5);
-    Forest_TreeAdd(&t.root, ".llr", n6);
+    Forest_TreeAdd(&t.root, ".ll", l2);
+    Forest_TreeAdd(&t.root, ".lr", l3);
+    Forest_TreeAdd(&t.root, ".rl", l1);
+    Forest_TreeAdd(&t.root, ".rr", n4);
+    Forest_TreeAdd(&t.root, ".rrr", n5);
+    Forest_TreeAdd(&t.root, ".rrl", l4);
+    Forest_TreeAdd(&t.root, ".rrrr", n6);
+    Forest_TreeAdd(&t.root, ".rrrl", l5);
+    Forest_TreeAdd(&t.root, ".rrrrr", n7);
+    Forest_TreeAdd(&t.root, ".rrrrl", l6);
+    Forest_TreeAdd(&t.root, ".rrrrrr", n8);
+    Forest_TreeAdd(&t.root, ".rrrrrl", l7);
+    Forest_TreeAdd(&t.root, ".rrrrrrr", n9);
+    Forest_TreeAdd(&t.root, ".rrrrrrl", l8);
+    Forest_TreeAdd(&t.root, ".rrrrrrrr", n10);
+    Forest_TreeAdd(&t.root, ".rrrrrrrl", l9);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrr", n11);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrl", l10);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrr", n12);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrl", l11);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrr", n13);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrl", l12);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrr", n14);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrl", l13);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrr", n15);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrl", l14);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrr", n16);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrl", l15);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrr", n17);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrl", l16);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrrr", n18);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrrl", l17);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrrrr", n19);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrrrl", l18);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrrrrr", l19);
+    Forest_TreeAdd(&t.root, ".rrrrrrrrrrrrrrrrrl", l20);
 
     LG_DEBUG("1***1\n");
     Forest_TreePrint(t.root, "+", 0);
@@ -599,5 +693,22 @@ void Forest_TreeTest() {
     LG_DEBUG("Original:\n");
     Forest_TreePrint(t.root, "+", 0);
 
-    return;
+    char path2 = 0;
+    char *s2 = NULL;
+    int len2 = Forest_TreeSerialize(&s2, dst.root, &path2, 0, 0);
+
+    if (len == len2) {
+        for (int i=0; i<len; i++) {
+            if (*(s+i) != *(s2+i)) {
+                LG_DEBUG("FAILED: TREES NOT EQUAL.  Len = %d", len);
+                return FOREST_ERR;
+            }
+        }
+        LG_DEBUG("SUCCESS");
+        return FOREST_OK;
+    } else {
+        LG_DEBUG("FAILED: TREE LENGTHS NOT EQUAL.  Lens = %d, %d", len, len2);
+        return FOREST_ERR;
+    }
+
 }
