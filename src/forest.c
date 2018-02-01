@@ -73,7 +73,7 @@ __forest_Node *Forest_NewLeaf(double predVal, char* stats) {
             len++;
         }
     }else{
-        len = (int)predVal + 1;
+        len = 1;
         total = 1; 
         n->stats = calloc(len ,sizeof(double));
         n->stats[len-1] = 1;
