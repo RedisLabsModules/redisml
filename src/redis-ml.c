@@ -225,7 +225,6 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_ERR;
     }
     /*Normalize tree values*/
-    Forest_NormalizeTree(t);
 #ifdef FOREST_USE_FAST_TREE
     Forest_GenFastTree(t);
 #endif
