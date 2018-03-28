@@ -16,8 +16,8 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
     l->inputSize = inputSize;
     l->weights = Matrix_New(size, inputSize);
     l->biases = Matrix_New(size, 1);
-    l->weightsCostGrad = Matrix_New(size, inputSize);
-    l->biasesCostGrad = Matrix_New(size, 1);
+    l->weightsGrad = Matrix_New(size, inputSize);
+    l->biasesGrad = Matrix_New(size, 1);
     l->activations = Matrix_New(size, 1);
     switch (activationType) {
         case SIGMOID:

@@ -8,9 +8,13 @@ typedef enum {
     CES
 } CostType;
 
-float CostLinear (Matrix, Matrix);
-float CostSSE (Matrix, Matrix);
-float CostCES (Matrix, Matrix);
+float CostLinear (float, float);
+float CostSSE (float, float);
+float CostCES (float, float);
+
+float CostLinearDeriv (float, float);
+float CostSSEDeriv (float, float);
+float CostCESDeriv (float, float);
 
 typedef struct {
     size_t nSamples;
@@ -22,6 +26,8 @@ typedef struct {
 typedef struct {
     int nlayers;
     Layer **layers;
+    float (* costFunc)(float, float);
+    float (* costDerivativeFunc)(float, float);
     DataSet *trainingData;
     DataSet *testData;
 } Network;

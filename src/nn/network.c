@@ -1,5 +1,13 @@
 #include "network.h"
 
+float CostSSE(float x, float y){
+    return (x - y) * (x - y);
+}
+
+float CostSSEDeriv(float x, float y){
+    return 2 * (x - y);
+}
+
 void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
     for (int c = 0; c < cycles; c++){
         for (int i = 0; i < n->trainingData->nSamples; i += batchSize){
@@ -12,7 +20,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
     for (int i = offset; i < offset + batchSize; i++){
         feedForward(n, n->trainingData->features + i);
         //calculate delta:
-        n->layers[0]->activationDerivativeFunc(0.1); 
+        n->costDerivativeFunc(0.1,0.1);
     }
 }
 
