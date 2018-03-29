@@ -15,6 +15,7 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
     l->size = size;
     l->inputSize = inputSize;
     l->weights = Matrix_New(size, inputSize);
+    l->z = Matrix_New(size, inputSize);
     l->biases = Matrix_New(size, 1);
     l->weightsGrad = Matrix_New(size, inputSize);
     l->biasesGrad = Matrix_New(size, 1);

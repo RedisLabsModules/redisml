@@ -3,10 +3,11 @@ ifeq ($(USE_BLAS), 1)
 endif
 
 CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./
+LDFLAGS = -lm $(BLAS_FLAGS)
 CC=gcc
 
 SOURCEDIR=$(abspath $(shell pwd -P)/.)
-C_SOURCES = $(wildcard $(SOURCEDIR)/*.c) 
+C_SOURCES = $(filter-out $(SOURCEDIR)/input.c, $(wildcard $(SOURCEDIR)/*.c))
 OBJS = $(patsubst %.c, %.o, $(C_SOURCES) )
 
 %.o: %.c %.h
@@ -14,10 +15,12 @@ OBJS = $(patsubst %.c, %.o, $(C_SOURCES) )
 
 
 all: $(OBJS)
+	$(CC) $(CFLAGS) input.c $(OBJS) $(LDFLAGS) -o input
+	$(info "OBJS = $(OBJS)")
 
 
 info:
-	$(info $(CC_SOURCES))
+	$(info $(C_SOURCES))
 
 .PHONY: info
 

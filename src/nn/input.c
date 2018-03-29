@@ -70,7 +70,7 @@ int main (int argc, char**argv) {
     n.layers = malloc(n.nlayers * sizeof(Layer));
     n.layers[0] = Layer_Init(100, rows * cols, FULLY_CONNECTED, SIGMOID);
     n.layers[1] = Layer_Init(10, rows * cols, FULLY_CONNECTED, SIGMOID);
-
+    n.costDerivativeFunc = &CostSSEDeriv;
     
 
 

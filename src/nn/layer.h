@@ -27,6 +27,7 @@ typedef struct layer{
     size_t inputSize;
     Matrix *weights;
     Matrix *biases;
+    Matrix *z;
     Matrix *weightsGrad;
     Matrix *biasesGrad;
     Matrix *activations;
