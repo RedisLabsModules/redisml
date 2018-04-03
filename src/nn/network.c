@@ -28,10 +28,9 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
 
         feedForward(n, n->trainingData->features + i);
         //calculate delta for the last layer:
-        for (int i = 0; i < l->delta->rows; i++){
-            l->delta->values[i] = n->costDerivativeFunc(l->a->values[i], 0.1) * SigmoidPrime(l->z->values[i]);
-            l->bGrad->values[i] = l->delta->values[i];
-            l->bGrad->values[i] = l->delta->values[i] * lp->a->values[i];
+        for (int i = 0; i < l->bDelta->rows; i++){
+            l->bDelta->values[i] = n->costDerivativeFunc(l->a->values[i], 0.1) * SigmoidPrime(l->z->values[i]);
+            l->wDelta->values[i] = l->bDelta->values[i] * lp->a->values[i];
         }
 
         //backprop through the rest of the layers
@@ -42,18 +41,15 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             
             Matrix *wt = Matrix_New(ln->w->cols, ln->w->rows);
             Matrix_Transpose(ln->w, wt);
-            Matrix_Multiply(wt, ln->delta, l->delta);
-            for (int i = 0; i < l->delta->rows; i++){
-                l->delta->values[i] *=  SigmoidPrime(l->z->values[i]);
-                l->bGrad->values[i] = l->delta->values[i];
-                l->bGrad->values[i] = l->delta->values[i] * lp->a->values[i];
+            Matrix_Multiply(wt, ln->bDelta, l->bDelta);
+            for (int i = 0; i < l->bDelta->rows; i++){
+                l->bDelta->values[i] *=  SigmoidPrime(l->z->values[i]);
+                l->wDelta->values[i] = l->bDelta->values[i] * lp->a->values[i];
             }
         }
     }
 }
 
-void backProp(Network *n, float *features, unsigned int label){
-}
 
 void feedForward(Network *n, float *features){
     Matrix input = {.cols = n->trainingData->featureSize, .rows = 1};

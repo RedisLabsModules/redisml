@@ -31,7 +31,8 @@ typedef struct layer{
     Matrix *wGrad;
     Matrix *bGrad;
     Matrix *a;
-    Matrix *delta;
+    Matrix *wDelta;
+    Matrix *bDelta;
 } Layer;
 
 Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType activationType);

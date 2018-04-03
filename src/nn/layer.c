@@ -20,7 +20,8 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
     l->wGrad = Matrix_New(size, inputSize);
     l->bGrad = Matrix_New(size, 1);
     l->a= Matrix_New(size, 1);
-    l->delta = Matrix_New(size, 1);
+    l->wDelta = Matrix_New(size, inputSize);
+    l->bDelta = Matrix_New(size, 1);
     switch (activationType) {
         case SIGMOID:
             l->activationFunc = &Sigmoid;

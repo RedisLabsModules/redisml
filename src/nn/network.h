@@ -36,8 +36,6 @@ void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate);
 
 void runMiniBatch(Network *n, int offset,size_t batchSize, float rate);
 
-void backProp(Network *n, float *features, unsigned int label); 
-
 void feedForward(Network *n, float *features);
 
 #endif //__NETWORK_H__
