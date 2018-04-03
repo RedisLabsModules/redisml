@@ -14,9 +14,11 @@ OBJS = $(patsubst %.c, %.o, $(C_SOURCES) )
 		$(CC) $(CFLAGS) $(BLAS_FLAGS) -c $< -o $@ 
 
 
-all: $(OBJS)
-	$(CC) $(CFLAGS) input.c $(OBJS) $(LDFLAGS) -o input
-	$(info "OBJS = $(OBJS)")
+all: input
+
+
+input: $(OBJS)
+	$(CC) $(CFLAGS) $@.c $(OBJS) $(LDFLAGS) -o $@
 
 
 info:

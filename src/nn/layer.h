@@ -25,12 +25,13 @@ typedef struct layer{
     float (* activationDerivativeFunc)(float x);
     size_t size;
     size_t inputSize;
-    Matrix *weights;
-    Matrix *biases;
+    Matrix *w;
+    Matrix *b;
     Matrix *z;
-    Matrix *weightsGrad;
-    Matrix *biasesGrad;
-    Matrix *activations;
+    Matrix *wGrad;
+    Matrix *bGrad;
+    Matrix *a;
+    Matrix *delta;
 } Layer;
 
 Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType activationType);

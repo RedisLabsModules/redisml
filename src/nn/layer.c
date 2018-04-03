@@ -14,12 +14,13 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
     l->activationType = activationType;
     l->size = size;
     l->inputSize = inputSize;
-    l->weights = Matrix_New(size, inputSize);
+    l->w= Matrix_New(size, inputSize);
     l->z = Matrix_New(size, inputSize);
-    l->biases = Matrix_New(size, 1);
-    l->weightsGrad = Matrix_New(size, inputSize);
-    l->biasesGrad = Matrix_New(size, 1);
-    l->activations = Matrix_New(size, 1);
+    l->b= Matrix_New(size, 1);
+    l->wGrad = Matrix_New(size, inputSize);
+    l->bGrad = Matrix_New(size, 1);
+    l->a= Matrix_New(size, 1);
+    l->delta = Matrix_New(size, 1);
     switch (activationType) {
         case SIGMOID:
             l->activationFunc = &Sigmoid;
@@ -32,10 +33,10 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
 }
 
 void Layer_CalcActivations(Layer *l, Matrix *input) {
-    Matrix_Multiply(input, l->weights, l->activations);
-    Matrix_Add(l->activations, l->biases, l->activations);
-    for (int i = 0; i < l->activations->rows * l->activations->cols; i++){
-        l->activations->values[i] = (*l->activationFunc)(l->activations->values[i]);
+    Matrix_Multiply(input, l->w, l->z);
+    Matrix_Add(l->a, l->b, l->z);
+    for (int i = 0; i < l->a->rows * l->a->cols; i++){
+        l->a->values[i] = (*l->activationFunc)(l->z->values[i]);
     }
 }
 
