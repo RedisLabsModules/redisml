@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/RedisLabsModules/redis-ml.svg?style=svg)](https://circleci.com/gh/RedisLabsModules/redis-ml)
+
 # Machine Learning Model Server on Redis
 
 ## Overview
