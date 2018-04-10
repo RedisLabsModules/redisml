@@ -52,9 +52,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
 
 
 void feedForward(Network *n, float *features){
-    Matrix input = {.cols = n->trainingData->featureSize, .rows = 1};
-    input.values = features;
-    Layer_CalcActivations(n->layers[0], &input);
+    n->layers[0]->a->values =  features;
     for (int i = 1; i < n->nlayers; n++){
         Layer_CalcActivations(n->layers[i], n->layers[i-1]->a);
     }

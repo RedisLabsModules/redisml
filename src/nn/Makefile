@@ -17,7 +17,7 @@ OBJS = $(patsubst %.c, %.o, $(C_SOURCES) )
 all: input
 
 
-input: $(OBJS)
+input: $(OBJS) input.c 
 	$(CC) $(CFLAGS) $@.c $(OBJS) $(LDFLAGS) -o $@
 
 
