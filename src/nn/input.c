@@ -4,9 +4,9 @@
 #include "layer.h"
 #include "network.h"
 
-void printDigit(unsigned char *d){
+void printDigit(float *d){
     for (int i = 0; i < 784; i++){
-        printf("%c", d[i]>100 ? '*' : ' ');
+        printf("%c", d[i]>0.5 ? '*' : ' ');
         if(i%28 == 0){
             printf("\n");
         }
@@ -63,14 +63,19 @@ int main (int argc, char**argv) {
     printf("cols: %d\n", cols);
 
     /* allocate training data */
-    unsigned char* trainingData = calloc(nimages * rows * cols, sizeof(unsigned char));
-    size_t rsize = fread(trainingData, 1, nimages * rows * cols, f);
+    unsigned char* tmpTrainingData = calloc(nimages * rows * cols, sizeof(unsigned char));
+    size_t rsize = fread(tmpTrainingData, 1, nimages * rows * cols, f);
     if (rsize != nimages * rows * cols){
         printf("error loading file to memory, read %zu bytes\n", rsize);
         return 0;
     }
     printf("success. read %zu bytes\n", rsize);
-   
+    float* trainingData = calloc(nimages * rows * cols, sizeof(float));
+    for (int i = 0; i < nimages * rows * cols; i++){
+        trainingData[i] = ((float)tmpTrainingData[i])/255.0;
+    }
+    free(tmpTrainingData);
+
     f = fopen("./data/mnist/train-labels-idx1-ubyte","r");
     if (f == NULL){
         printf("file missing\n");
