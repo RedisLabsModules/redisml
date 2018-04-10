@@ -53,7 +53,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
 
 void feedForward(Network *n, float *features){
     n->layers[0]->a->values =  features;
-    for (int i = 1; i < n->nlayers; n++){
+    for (int i = 1; i < n->nlayers; i++){
         Layer_CalcActivations(n->layers[i], n->layers[i-1]->a);
     }
 }

@@ -21,7 +21,7 @@ void Matrix_Print(Matrix *m) {
     printf("\n");
     for (int i = 0; i < m->rows; i++) {
         for (int j = 0; j < m->cols; j++){
-            printf("%.2f, ", MATRIX(m, i, j));
+            printf("%.3f, ", MATRIX(m, i, j));
         }
         printf("\n");
     }
