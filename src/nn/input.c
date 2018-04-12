@@ -133,10 +133,14 @@ int main (int argc, char**argv) {
         }
     }
     //Matrix_Print(n->layers[0]->a);    
-    printf("zzzzzz 1:\n");
-    Matrix_Print(n->layers[1]->z);    
-    printf("zzzzzz 2:\n");
-    Matrix_Print(n->layers[2]->z);    
+    printf("w 1:\n");
+    Matrix_Print(n->layers[1]->w);    
+    printf("a 1:\n");
+    Matrix_Print(n->layers[1]->a);    
+    printf("w 2:\n");
+    Matrix_Print(n->layers[2]->w);    
+    printf("a 2:\n");
+    Matrix_Print(n->layers[2]->a);    
     return(0);
 }
 

@@ -34,7 +34,7 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
 
     for (int i = 0; i < size * inputSize; i++){
         //l->w->values[i] = ((float)(i%10-5))/10.0;
-        l->w->values[i] = 1.0f / inputSize;
+        l->w->values[i] = 0.01f;
         //printf("%.3f\n",l->w->values[i]);
     }
 
