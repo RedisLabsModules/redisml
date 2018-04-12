@@ -107,16 +107,22 @@ int main (int argc, char**argv) {
     Network *n = malloc(sizeof(Network));
     n->nlayers = 3;
     n->layers = malloc(n->nlayers * sizeof(Layer *));
-    n->layers[0] = malloc(sizeof(Layer));
+/*    n->layers[0] = malloc(sizeof(Layer));
     n->layers[0]->a = malloc(sizeof(Matrix *));
     n->layers[0]->a->rows = rows * cols;
     n->layers[0]->a->cols = 1;
+*/
+
+
+    n->layers[0] = Layer_Init(rows * cols, 1,FULLY_CONNECTED, SIGMOID);
     n->layers[1] = Layer_Init(30, rows * cols, FULLY_CONNECTED, SIGMOID);
     n->layers[2] = Layer_Init(10, 30, FULLY_CONNECTED, SIGMOID);
     n->costDerivativeFunc = &CostSSEDeriv;
 
     printf("weights:\n");
     Matrix_Print(n->layers[2]->w);    
+    printf("biases:\n");
+    Matrix_Print(n->layers[2]->b);    
     printf("zzzzzz:\n");
     Matrix_Print(n->layers[2]->z);    
     for (int i = 0; i < 10; i++){

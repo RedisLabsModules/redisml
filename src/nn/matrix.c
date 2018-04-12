@@ -56,7 +56,7 @@ void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c) {
     Matrix *bt = Matrix_New(b->cols, b->rows);
     Matrix_Transpose(b, bt);
     for (int ai = 0; ai < a->rows; ai++) {
-       for (int bti = 0; bti < a->rows; bti++) {
+       for (int bti = 0; bti < b->cols; bti++) {
           for (int j = 0; j < a->cols; j++) {
               MATRIX(c, ai, bti) += MATRIX(a, ai, j) * MATRIX(bt, bti, j);
           }

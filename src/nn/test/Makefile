@@ -2,11 +2,12 @@ ifeq ($(USE_BLAS), 1)
 	BLAS_FLAGS = -l:libcblas.a -l:libatlas.a -lpthread -DUSE_BLAS
 endif
 
-CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./
+CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./ 
 CC=gcc
 
 SOURCEDIR=$(abspath $(shell pwd -P)/../)
-C_SOURCES = $(wildcard $(SOURCEDIR)/*.c) 
+#C_SOURCES = $(wildcard $(SOURCEDIR)/*.c)
+C_SOURCES = $(filter-out $(SOURCEDIR)/input.c, $(wildcard $(SOURCEDIR)/*.c))
 OBJS = $(patsubst %.c, %.o, $(C_SOURCES) )
 
 TEST_SOURCES = $(abspath $(wildcard test_*.c))
@@ -17,7 +18,7 @@ TEST_EXECUTABLES = $(patsubst %.c, %.run, $(TEST_SOURCES))
 		$(CC) $(CFLAGS) $(BLAS_FLAGS) -c $< -o $@ 
 
 %.run: %.c
-		$(CC) $(CFLAGS) $(OBJS) $< -o $@ -DTEST $(BLAS_FLAGS)
+		$(CC) $(CFLAGS) $(OBJS) $< -o $@ -DTEST -lm $(BLAS_FLAGS)
 
 all: objs build test
 

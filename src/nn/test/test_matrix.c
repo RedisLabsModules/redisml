@@ -42,6 +42,30 @@ int testMatrixMultiply() {
     test->values[1] = 64.0f;
     test->values[2] = 139.0f;
     test->values[3] = 154.0f;
+ 
+
+
+    a = Matrix_New(2, 3);
+
+    for ( int i=0; i < a->rows * a->cols; i++) {
+        a->values[i] = i + 1;
+    }
+    Matrix_Print(a);
+    
+    b = Matrix_New(3, 1);
+
+    for ( int i=0; i < b->rows * b->cols; i++) {
+        b->values[i] = i + 1;
+    }
+    Matrix_Print(b);
+
+    c = Matrix_New(2, 1);
+    Matrix_Multiply(a, b, c);
+    Matrix_Print(c);
+    test = Matrix_New(2, 1);
+    test->values[0] = 14.0f;
+    test->values[1] = 32.0f;
+    ASSERT_EQUAL(1, Matrix_IsEqual(c, test));
     ASSERT_EQUAL(1, Matrix_IsEqual(c, test));
     Matrix_Free(a);
     Matrix_Free(b);

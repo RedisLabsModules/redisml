@@ -1,5 +1,5 @@
 ifeq ($(USE_BLAS), 1) 
-	BLAS_FLAGS = -l:libcblas.a -l:libatlas.a -DUSE_BLAS
+	BLAS_FLAGS = -pthread -l:libcblas.a -l:libatlas.a -DUSE_BLAS
 endif
 
 CFLAGS = -g -O3 -fPIC -D_GNU_SOURCE -std=gnu99 -I./
