@@ -72,7 +72,7 @@ int main (int argc, char**argv) {
     printf("success. read %zu bytes\n", rsize);
     float* trainingData = calloc(nimages * rows * cols, sizeof(float));
     for (int i = 0; i < nimages * rows * cols; i++){
-        trainingData[i] = ((float)tmpTrainingData[i])/255.0;
+        trainingData[i] = ((float)tmpTrainingData[i])/256.0;
     }
     free(tmpTrainingData);
 
@@ -107,11 +107,6 @@ int main (int argc, char**argv) {
     Network *n = malloc(sizeof(Network));
     n->nlayers = 3;
     n->layers = malloc(n->nlayers * sizeof(Layer *));
-/*    n->layers[0] = malloc(sizeof(Layer));
-    n->layers[0]->a = malloc(sizeof(Matrix *));
-    n->layers[0]->a->rows = rows * cols;
-    n->layers[0]->a->cols = 1;
-*/
 
 
     n->layers[0] = Layer_Init(rows * cols, 1,FULLY_CONNECTED, SIGMOID);
@@ -125,22 +120,24 @@ int main (int argc, char**argv) {
     Matrix_Print(n->layers[2]->b);    
     printf("zzzzzz:\n");
     Matrix_Print(n->layers[2]->z);    
-    for (int i = 0; i < 10; i++){
-        printf("\nactivation[%d]: ", i);
+    //printf("a0:\n");
+    //Matrix_Print(n->layers[0]->a);    
+    for (int i = 0; i < 5; i++){
+        printf("\nactivation[%d]: \n", i);
         feedForward(n, &trainingData[i * 784]);
-        for (int a = 0; a < 10; a++){
-            printf("%.3f, ", n->layers[2]->a->values[a]);
-        }
+        //Matrix_Print(n->layers[0]->a);    
+        printf("a %d:\n",i);
+        Matrix_Print(n->layers[2]->a);    
     }
     //Matrix_Print(n->layers[0]->a);    
-    printf("w 1:\n");
-    Matrix_Print(n->layers[1]->w);    
-    printf("a 1:\n");
-    Matrix_Print(n->layers[1]->a);    
-    printf("w 2:\n");
-    Matrix_Print(n->layers[2]->w);    
-    printf("a 2:\n");
-    Matrix_Print(n->layers[2]->a);    
+    //printf("w 1:\n");
+    //Matrix_Print(n->layers[1]->w);    
+    //printf("a 1:\n");
+    //Matrix_Print(n->layers[1]->a);    
+    //printf("w 2:\n");
+    //Matrix_Print(n->layers[2]->w);    
+    //printf("a 2:\n");
+    //Matrix_Print(n->layers[2]->a);    
     return(0);
 }
 

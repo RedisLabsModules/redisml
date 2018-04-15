@@ -42,17 +42,15 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
 }
 
 void Layer_CalcActivations(Layer *l, Matrix *input) {
-    //printf("\nlayer calc activations: input(%zu,%zu), layer w(%zu,%zu), layer z(%zu,%zu) layer b(%zu,%zu)\n",input->rows,input->cols,l->w->rows,l->w->cols,l->z->rows,l->z->cols,l->b->rows,l->b->cols);
+    Matrix_Zeros(l->z);
     Matrix_Multiply(l->w, input, l->z);
     
-    printf("\nlayer calc activations: input(%zu,%zu), layer w(%zu,%zu), layer z(%zu,%zu) layer b(%zu,%zu)\n",input->rows,input->cols,l->w->rows,l->w->cols,l->z->rows,l->z->cols,l->b->rows,l->b->cols);
-    Matrix_Print(l->b);
-
+    //printf("\nlayer calc activations: input(%zu,%zu), layer w(%zu,%zu), layer z(%zu,%zu) layer b(%zu,%zu)\n",input->rows,input->cols,l->w->rows,l->w->cols,l->z->rows,l->z->cols,l->b->rows,l->b->cols);
 
     for (int i = 0; i < l->z->rows; i++) {
         l->z->values[i] += l->b->values[i];
     }
-    printf("layer calc activations loop\n");
+    
     for (int i = 0; i < l->a->rows * l->a->cols; i++){
         l->a->values[i] = (*l->activationFunc)(l->z->values[i]);
     }

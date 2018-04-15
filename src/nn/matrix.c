@@ -21,7 +21,7 @@ void Matrix_Print(Matrix *m) {
     printf("\n");
     for (int i = 0; i < m->rows; i++) {
         for (int j = 0; j < m->cols; j++){
-            printf("%.3f, ", MATRIX(m, i, j));
+            printf("%.5f, ", MATRIX(m, i, j));
         }
         printf("\n");
     }
@@ -70,6 +70,10 @@ void Matrix_Add(Matrix *a, Matrix *b, Matrix *c) {
     for (int i = 0; i < a->rows * a->cols; i++) {
         c->values[i] = a->values[i] + b->values[i];
     }
+}
+
+void Matrix_Zeros(Matrix *a) {
+    memset(a->values, 0, a->rows * a->cols * sizeof(float));
 }
 
  
