@@ -20,7 +20,7 @@ typedef struct {
     size_t nSamples;
     size_t featureSize;
     float *features;
-    unsigned int *labels;
+    unsigned char *labels;
 } DataSet; 
 
 typedef struct {

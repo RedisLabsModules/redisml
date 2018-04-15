@@ -107,6 +107,12 @@ int main (int argc, char**argv) {
     Network *n = malloc(sizeof(Network));
     n->nlayers = 3;
     n->layers = malloc(n->nlayers * sizeof(Layer *));
+    n->trainingData = malloc(sizeof(DataSet));
+    //n->trainingData->nSamples = nimages;
+    n->trainingData->nSamples = 1;
+    n->trainingData->featureSize = rows * cols;
+    n->trainingData->features = trainingData;
+    n->trainingData->labels = trainingLabels;
 
 
     n->layers[0] = Layer_Init(rows * cols, 1,FULLY_CONNECTED, SIGMOID);
@@ -122,13 +128,15 @@ int main (int argc, char**argv) {
     Matrix_Print(n->layers[2]->z);    
     //printf("a0:\n");
     //Matrix_Print(n->layers[0]->a);    
-    for (int i = 0; i < 5; i++){
+    /*for (int i = 0; i < 5; i++){
         printf("\nactivation[%d]: \n", i);
         feedForward(n, &trainingData[i * 784]);
         //Matrix_Print(n->layers[0]->a);    
         printf("a %d:\n",i);
         Matrix_Print(n->layers[2]->a);    
-    }
+    }*/
+
+    NN_SGD(n,1,1,3.0f);
     //Matrix_Print(n->layers[0]->a);    
     //printf("w 1:\n");
     //Matrix_Print(n->layers[1]->w);    
@@ -138,6 +146,8 @@ int main (int argc, char**argv) {
     //Matrix_Print(n->layers[2]->w);    
     //printf("a 2:\n");
     //Matrix_Print(n->layers[2]->a);    
+        feedForward(n, trainingData);
+        Matrix_Print(n->layers[2]->a);    
     return(0);
 }
 
