@@ -72,6 +72,12 @@ void Matrix_Add(Matrix *a, Matrix *b, Matrix *c) {
     }
 }
 
+void Matrix_Hadamard(Matrix *a, Matrix *b, Matrix *c) {
+    for (int i = 0; i < a->rows * a->cols; i++) {
+        c->values[i] = a->values[i] * b->values[i];
+    }
+}
+
 void Matrix_Zeros(Matrix *a) {
     memset(a->values, 0, a->rows * a->cols * sizeof(float));
 }

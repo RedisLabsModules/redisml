@@ -18,6 +18,7 @@ int Matrix_IsEqual(Matrix *a, Matrix *b);
 void Matrix_Transpose(Matrix *m, Matrix *mt);
 void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c); 
 void Matrix_Add(Matrix *a, Matrix *b, Matrix* c); 
+void Matrix_Hadamard(Matrix *a, Matrix *b, Matrix* c); 
 void Matrix_Zeros(Matrix *a);
 
 #define MATRIX(m,i,j) m->values[(i) * m->cols + j]

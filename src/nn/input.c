@@ -94,12 +94,13 @@ int main (int argc, char**argv) {
         printf("error loading file to memory, read %zu bytes\n", rsize);
         return 0;
     }
+    fclose(f);
+    
     int l = 0;
     for (int i = 0; i < 7840; i+= 784){
         printf("\n\nlabel = %u\n", trainingLabels[l++]);
         printDigit(&trainingData[i]);
     }
-    fclose(f);
     
     
     
@@ -108,8 +109,8 @@ int main (int argc, char**argv) {
     n->nlayers = 3;
     n->layers = malloc(n->nlayers * sizeof(Layer *));
     n->trainingData = malloc(sizeof(DataSet));
-    //n->trainingData->nSamples = nimages;
-    n->trainingData->nSamples = 1;
+    //n->trainingData->nSamples = nimages/10;
+    n->trainingData->nSamples = 4;
     n->trainingData->featureSize = rows * cols;
     n->trainingData->features = trainingData;
     n->trainingData->labels = trainingLabels;
@@ -136,7 +137,14 @@ int main (int argc, char**argv) {
         Matrix_Print(n->layers[2]->a);    
     }*/
 
-    NN_SGD(n,1,1,3.0f);
+    NN_SGD(n, 1, 4, 3.0f);
+    for (int i = 0; i < 3; i++){
+        printf("\nactivation[%d]: \n", i);
+        feedForward(n, &trainingData[0 * i * 784]);
+        Matrix_Print(n->layers[2]->a);    
+        //printf("\nlabel = %u\n", trainingLabels[i]);
+    }
+
     //Matrix_Print(n->layers[0]->a);    
     //printf("w 1:\n");
     //Matrix_Print(n->layers[1]->w);    
@@ -145,9 +153,7 @@ int main (int argc, char**argv) {
     //printf("w 2:\n");
     //Matrix_Print(n->layers[2]->w);    
     //printf("a 2:\n");
-    //Matrix_Print(n->layers[2]->a);    
-        feedForward(n, trainingData);
-        Matrix_Print(n->layers[2]->a);    
+    //Matrix_Print(n->layers[2]->a);   
     return(0);
 }
 
