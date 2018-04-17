@@ -13,7 +13,7 @@ typedef struct {
 
 Matrix *Matrix_New(size_t rows, size_t cols);
 void Matrix_Free(Matrix *m);
-void Matrix_Print(Matrix *m);
+void Matrix_Print(Matrix *m, size_t limit);
 int Matrix_IsEqual(Matrix *a, Matrix *b);
 void Matrix_Transpose(Matrix *m, Matrix *mt);
 void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c); 

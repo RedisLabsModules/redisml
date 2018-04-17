@@ -26,6 +26,8 @@ void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
                     l->b->values[b] -= l->bGrad->values[b]*rate/(float)batchSize;
                 }
             } 
+            printf("w[2]:\n");
+            Matrix_Print(n->layers[2]->w, 0);
         }
     }
 }
@@ -39,8 +41,14 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
     for (int i = offset; i < offset + batchSize; i++){
         l = n->layers[n->nlayers - 1];
         lp = n->layers[n->nlayers - 2];
-
-        feedForward(n, n->trainingData->features + i * n->trainingData->featureSize);
+        printf("******* START BP %d\n", i - offset);
+        feedForward(n, &n->trainingData->features[i * n->trainingData->featureSize]);
+        printf("activations:\n");
+        Matrix_Print(l->a, 0);
+        printf("z:\n");
+        Matrix_Print(l->z, 5);
+        printf("w:\n");
+        Matrix_Print(l->w, 5);
         int class  = n->trainingData->labels[i];
         //calculate delta for the last layer:
         for (int i = 0; i < l->delta->rows; i++){
@@ -54,7 +62,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
         Matrix_Free(lpat);
 
         printf("bDeltaL:\n");
-        Matrix_Print(l->bDelta);
+        Matrix_Print(l->bDelta, 0);
         //backprop through the rest of the layers
         for (int idx = n->nlayers - 2; idx >= 1; idx--){
             l = n->layers[idx];
@@ -63,18 +71,27 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             
             Matrix *lntw = Matrix_New(ln->w->cols, ln->w->rows);
             Matrix_Transpose(ln->w, lntw);
+            Matrix_Zeros(l->bDelta);
             Matrix_Multiply(lntw, ln->delta, l->bDelta);
+            printf("z0:\n");
+            Matrix_Print(l->z, 0);
+            printf("w-l+1:\n");
+            Matrix_Print(lntw, 0);
             Matrix_Free(lntw);
+            printf("old delta:\n");
+            Matrix_Print(ln->delta, 0);
             for (int i = 0; i < l->bDelta->rows; i++){
                 l->bDelta->values[i] *=  SigmoidPrime(l->z->values[i]);
             }
+            printf("new delta:\n");
+            Matrix_Print(l->bDelta, 0);
+
             Matrix *lpat2 = Matrix_New(lp->a->cols, lp->a->rows);
             Matrix_Transpose(lp->a, lpat2);
             Matrix_Multiply(l->bDelta, lpat2, l->wDelta);
             Matrix_Free(lpat2);
-            printf("bDelta0:\n");
-            Matrix_Print(l->bDelta);
         }
+        printf("******* END BP %d\n", i - offset);
     }
 }
 

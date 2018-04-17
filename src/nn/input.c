@@ -110,7 +110,7 @@ int main (int argc, char**argv) {
     n->layers = malloc(n->nlayers * sizeof(Layer *));
     n->trainingData = malloc(sizeof(DataSet));
     //n->trainingData->nSamples = nimages/10;
-    n->trainingData->nSamples = 4;
+    n->trainingData->nSamples = 6;
     n->trainingData->featureSize = rows * cols;
     n->trainingData->features = trainingData;
     n->trainingData->labels = trainingLabels;
@@ -122,38 +122,38 @@ int main (int argc, char**argv) {
     n->costDerivativeFunc = &CostSSEDeriv;
 
     printf("weights:\n");
-    Matrix_Print(n->layers[2]->w);    
+    Matrix_Print(n->layers[2]->w, 0);    
     printf("biases:\n");
-    Matrix_Print(n->layers[2]->b);    
+    Matrix_Print(n->layers[2]->b, 0);    
     printf("zzzzzz:\n");
-    Matrix_Print(n->layers[2]->z);    
+    Matrix_Print(n->layers[2]->z, 0);    
     //printf("a0:\n");
-    //Matrix_Print(n->layers[0]->a);    
+    //Matrix_Print(n->layers[0]->a, 0);    
     /*for (int i = 0; i < 5; i++){
         printf("\nactivation[%d]: \n", i);
         feedForward(n, &trainingData[i * 784]);
-        //Matrix_Print(n->layers[0]->a);    
+        //Matrix_Print(n->layers[0]->a, 0);    
         printf("a %d:\n",i);
-        Matrix_Print(n->layers[2]->a);    
+        Matrix_Print(n->layers[2]->a, 0);    
     }*/
 
-    NN_SGD(n, 1, 4, 3.0f);
-    for (int i = 0; i < 3; i++){
+    NN_SGD(n, 1, 3, 3.0f);
+    for (int i = 0; i < 1; i++){
         printf("\nactivation[%d]: \n", i);
         feedForward(n, &trainingData[0 * i * 784]);
-        Matrix_Print(n->layers[2]->a);    
+        Matrix_Print(n->layers[2]->a, 0);    
         //printf("\nlabel = %u\n", trainingLabels[i]);
     }
 
-    //Matrix_Print(n->layers[0]->a);    
+    //Matrix_Print(n->layers[0]->a, 0);    
     //printf("w 1:\n");
-    //Matrix_Print(n->layers[1]->w);    
+    //Matrix_Print(n->layers[1]->w, 0);    
     //printf("a 1:\n");
-    //Matrix_Print(n->layers[1]->a);    
+    //Matrix_Print(n->layers[1]->a, 0);    
     //printf("w 2:\n");
-    //Matrix_Print(n->layers[2]->w);    
+    //Matrix_Print(n->layers[2]->w, 0);    
     //printf("a 2:\n");
-    //Matrix_Print(n->layers[2]->a);   
+    //Matrix_Print(n->layers[2]->a, 0);   
     return(0);
 }
 

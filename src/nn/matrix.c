@@ -17,10 +17,14 @@ void Matrix_Free(Matrix *m) {
     free(m);
 }
 
-void Matrix_Print(Matrix *m) {
+void Matrix_Print(Matrix *m, size_t max) {
     printf("\n");
     for (int i = 0; i < m->rows; i++) {
         for (int j = 0; j < m->cols; j++){
+            if(max > 0 && i * m->cols + j > max){
+                printf("\n");
+                return;
+            }
             printf("%.5f, ", MATRIX(m, i, j));
         }
         printf("\n");
