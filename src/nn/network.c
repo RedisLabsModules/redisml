@@ -28,10 +28,10 @@ void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
                     l->b->values[b] -= l->bGrad->values[b]*rate/(float)batchSize;
                 }
             } 
-            printf("w[2]:\n");
-            Matrix_Print(n->layers[2]->w, 0);
-            printf("b[2]:\n");
-            Matrix_Print(n->layers[2]->b, 0);
+            //printf("w[2]:\n");
+            //Matrix_Print(n->layers[2]->w, 0);
+            //printf("b[2]:\n");
+            //Matrix_Print(n->layers[2]->b, 0);
         }
     }
 }
@@ -45,16 +45,16 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
     for (int i = offset; i < offset + batchSize; i++){
         l = n->layers[n->nlayers - 1];
         lp = n->layers[n->nlayers - 2];
-        printf("******* START BP %d\n", i - offset);
+        //printf("******* START BP %d\n", i - offset);
         feedForward(n, &n->trainingData->features[i * n->trainingData->featureSize]);
-        printf("activations:\n");
-        Matrix_Print(l->a, 0);
-        printf("z:\n");
-        Matrix_Print(l->z, 5);
-        printf("w:\n");
-        Matrix_Print(l->w, 5);
-        printf("b:\n");
-        Matrix_Print(l->b, 5);
+        //printf("activations:\n");
+        //Matrix_Print(l->a, 0);
+        //printf("z:\n");
+        //Matrix_Print(l->z, 5);
+        //printf("w:\n");
+        //Matrix_Print(l->w, 5);
+        //printf("b:\n");
+        //Matrix_Print(l->b, 5);
         int class  = n->trainingData->labels[i];
         //calculate delta for the last layer:
         for (int i = 0; i < l->delta->rows; i++){
@@ -68,8 +68,8 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
         Matrix_Multiply(l->bDelta, lpat, l->wDelta);
         Matrix_Free(lpat);
 
-        printf("bDeltaL:\n");
-        Matrix_Print(l->bDelta, 0);
+        //printf("bDeltaL:\n");
+        //Matrix_Print(l->bDelta, 0);
         //backprop through the rest of the layers
         for (int idx = n->nlayers - 2; idx >= 1; idx--){
             l = n->layers[idx];
@@ -80,20 +80,20 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             Matrix_Transpose(ln->w, lntw);
             Matrix_Zeros(l->bDelta);
             Matrix_Multiply(lntw, ln->delta, l->bDelta);
-            printf("z0:\n");
-            Matrix_Print(l->z, 0);
-            printf("b0:\n");
-            Matrix_Print(l->b, 5);
-            printf("w-l+1:\n");
-            Matrix_Print(lntw, 0);
+            //printf("z0:\n");
+            //Matrix_Print(l->z, 0);
+            //printf("b0:\n");
+            //Matrix_Print(l->b, 5);
+            //printf("w-l+1:\n");
+            //Matrix_Print(lntw, 0);
             Matrix_Free(lntw);
-            printf("old delta:\n");
-            Matrix_Print(ln->delta, 0);
+            //printf("old delta:\n");
+            //Matrix_Print(ln->delta, 0);
             for (int i = 0; i < l->bDelta->rows; i++){
                 l->bDelta->values[i] *=  SigmoidPrime(l->z->values[i]);
             }
-            printf("new delta:\n");
-            Matrix_Print(l->bDelta, 0);
+            //printf("new delta:\n");
+            //Matrix_Print(l->bDelta, 0);
 
             Matrix *lpat2 = Matrix_New(lp->a->cols, lp->a->rows);
             Matrix_Transpose(lp->a, lpat2);
@@ -105,12 +105,12 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             l = n->layers[idx];
             Matrix_Add(l->wGrad, l->wDelta, l->wGrad);
             Matrix_Add(l->bGrad, l->bDelta, l->bGrad);
-            printf("bGrad:\n");
-            Matrix_Print(l->bGrad, 0);
-            printf("wGrad:\n");
-            Matrix_Print(l->wGrad, 10);
+            //printf("bGrad:\n");
+            //Matrix_Print(l->bGrad, 0);
+            //printf("wGrad:\n");
+            //Matrix_Print(l->wGrad, 10);
         }
-        printf("******* END BP %d\n", i - offset);
+        //printf("******* END BP %d\n", i - offset);
     }
 }
 
@@ -121,5 +121,33 @@ void feedForward(Network *n, float *features){
         Layer_CalcActivations(n->layers[i], n->layers[i-1]->a);
     }
 }
+
+int getMaxActivation(Network *n){
+    float maxVal = 0;
+    float index = 0;
+    float val = 0;
+    Matrix *a = n->layers[n->nlayers - 1]->a;
+    for (int i = 0; i < a->rows; i++){
+        val = a->values[i];
+        if (val > maxVal){
+            maxVal = val;
+            index = i;
+        }
+    }
+    return index;
+}
+
+void NN_Eval(Network *n, int numSamples){
+    int ok = 0;
+    for (int i = 0; i < numSamples; i++){
+        feedForward(n, &n->trainingData->features[i * n->trainingData->featureSize]);
+        if (n->trainingData->labels[i] == getMaxActivation(n)){
+            ok++;
+        }
+    }
+    printf("%d/%d ok.\n",ok,numSamples);
+}
+
+
 
 

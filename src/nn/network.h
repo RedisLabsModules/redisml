@@ -38,4 +38,8 @@ void runMiniBatch(Network *n, int offset,size_t batchSize, float rate);
 
 void feedForward(Network *n, float *features);
 
+int getMaxActivation(Network *n);
+
+void NN_Eval(Network *n, int numSamples);
+ 
 #endif //__NETWORK_H__

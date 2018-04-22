@@ -110,7 +110,7 @@ int main (int argc, char**argv) {
     n->layers = malloc(n->nlayers * sizeof(Layer *));
     n->trainingData = malloc(sizeof(DataSet));
     //n->trainingData->nSamples = nimages/10;
-    n->trainingData->nSamples = 6;
+    n->trainingData->nSamples = 10000;
     n->trainingData->featureSize = rows * cols;
     n->trainingData->features = trainingData;
     n->trainingData->labels = trainingLabels;
@@ -137,13 +137,15 @@ int main (int argc, char**argv) {
         Matrix_Print(n->layers[2]->a, 0);    
     }*/
 
-    NN_SGD(n, 1, 3, 3.0f);
-    for (int i = 0; i < 1; i++){
-        printf("\nactivation[%d]: \n", i);
-        feedForward(n, &trainingData[0 * i * 784]);
-        Matrix_Print(n->layers[2]->a, 0);    
-        //printf("\nlabel = %u\n", trainingLabels[i]);
-    }
+    NN_Eval(n, 5000);
+    NN_SGD(n, 40, 50, 3.0f);
+    NN_Eval(n, 5000);
+    NN_SGD(n, 40, 50, 3.0f);
+    NN_Eval(n, 5000);
+    NN_SGD(n, 40, 50, 3.0f);
+    NN_Eval(n, 5000);
+    NN_SGD(n, 40, 50, 3.0f);
+    NN_Eval(n, 5000);
 
     //Matrix_Print(n->layers[0]->a, 0);    
     //printf("w 1:\n");
