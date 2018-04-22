@@ -25,7 +25,7 @@ void Matrix_Print(Matrix *m, size_t max) {
                 printf("\n");
                 return;
             }
-            printf("%.5f, ", MATRIX(m, i, j));
+            printf("%f, ", MATRIX(m, i, j));
         }
         printf("\n");
     }

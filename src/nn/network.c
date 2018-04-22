@@ -33,6 +33,11 @@ void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
             //printf("b[2]:\n");
             //Matrix_Print(n->layers[2]->b, 0);
         }
+        NN_Eval(n, 10000);
+        printf("w[2]:\n");
+        Matrix_Print(n->layers[2]->w, 0);
+        printf("b[2]:\n");
+        Matrix_Print(n->layers[2]->b, 0);
     }
 }
 
@@ -116,6 +121,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
 
 
 void feedForward(Network *n, float *features){
+    //memcpy(n->layers[0]->a->values, features, n->layers[0]->a->rows * sizeof(float));
     n->layers[0]->a->values =  features;
     for (int i = 1; i < n->nlayers; i++){
         Layer_CalcActivations(n->layers[i], n->layers[i-1]->a);
@@ -125,12 +131,10 @@ void feedForward(Network *n, float *features){
 int getMaxActivation(Network *n){
     float maxVal = 0;
     float index = 0;
-    float val = 0;
     Matrix *a = n->layers[n->nlayers - 1]->a;
     for (int i = 0; i < a->rows; i++){
-        val = a->values[i];
-        if (val > maxVal){
-            maxVal = val;
+        if (a->values[i] > maxVal){
+            maxVal = a->values[i];
             index = i;
         }
     }

@@ -34,13 +34,13 @@ int main (int argc, char**argv) {
     int cycles = atoi(argv[2]);
     int batchSize = atoi(argv[3]);
     float learningRate = atof(argv[4]);
-    int nlayers = atoi(argv[5]);
+    int nsamples = atoi(argv[5]);
 
     printf("trainingDataFile: %s\n", trainingDataFile);
     printf("cycles: %d\n", cycles);
     printf("batchSize: %d\n", batchSize);
     printf("learningRate: %.3f\n", learningRate);
-    printf("nlayers: %d\n", nlayers);
+    printf("nsamples: %d\n", nsamples);
 
     FILE *f;
     unsigned char buff[4];
@@ -95,13 +95,13 @@ int main (int argc, char**argv) {
         return 0;
     }
     fclose(f);
-    
+    /*
     int l = 0;
     for (int i = 0; i < 7840; i+= 784){
         printf("\n\nlabel = %u\n", trainingLabels[l++]);
         printDigit(&trainingData[i]);
     }
-    
+    */
     
     
     /* init the network */
@@ -110,7 +110,7 @@ int main (int argc, char**argv) {
     n->layers = malloc(n->nlayers * sizeof(Layer *));
     n->trainingData = malloc(sizeof(DataSet));
     //n->trainingData->nSamples = nimages/10;
-    n->trainingData->nSamples = 10000;
+    n->trainingData->nSamples = nsamples;
     n->trainingData->featureSize = rows * cols;
     n->trainingData->features = trainingData;
     n->trainingData->labels = trainingLabels;
@@ -120,13 +120,15 @@ int main (int argc, char**argv) {
     n->layers[1] = Layer_Init(30, rows * cols, FULLY_CONNECTED, SIGMOID);
     n->layers[2] = Layer_Init(10, 30, FULLY_CONNECTED, SIGMOID);
     n->costDerivativeFunc = &CostSSEDeriv;
-
+    
+    /*
     printf("weights:\n");
     Matrix_Print(n->layers[2]->w, 0);    
     printf("biases:\n");
     Matrix_Print(n->layers[2]->b, 0);    
     printf("zzzzzz:\n");
     Matrix_Print(n->layers[2]->z, 0);    
+    */
     //printf("a0:\n");
     //Matrix_Print(n->layers[0]->a, 0);    
     /*for (int i = 0; i < 5; i++){
@@ -137,15 +139,19 @@ int main (int argc, char**argv) {
         Matrix_Print(n->layers[2]->a, 0);    
     }*/
 
-    NN_Eval(n, 5000);
+    NN_Eval(n, 10000);
+    NN_SGD(n, cycles, batchSize, learningRate);
+    /*
+    NN_Eval(n, 10000);
+    
+    NN_SGD(n, 40, 50, 3.0f);
+    NN_Eval(n, 10000);
+    
     NN_SGD(n, 40, 50, 3.0f);
     NN_Eval(n, 5000);
     NN_SGD(n, 40, 50, 3.0f);
     NN_Eval(n, 5000);
-    NN_SGD(n, 40, 50, 3.0f);
-    NN_Eval(n, 5000);
-    NN_SGD(n, 40, 50, 3.0f);
-    NN_Eval(n, 5000);
+    */
 
     //Matrix_Print(n->layers[0]->a, 0);    
     //printf("w 1:\n");

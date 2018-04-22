@@ -33,10 +33,12 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
             l->activationDerivativeFunc = &SigmoidPrime;
     }
 
-    for (int i = 0; i < size * inputSize; i++){
-        //l->w->values[i] = ((float)(i%10-5))/10.0;
-        l->w->values[i] = 0.01f;
-        //printf("%.3f\n",l->w->values[i]);
+    for (int i = 0; i < l->w->rows * l->w->cols; i++){
+        l->w->values[i] = 0.001f;
+    }
+
+    for (int i = 0; i < l->b->rows * l->b->cols; i++){
+        l->b->values[i] = 0.001f;
     }
 
     return l;
@@ -45,13 +47,12 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
 void Layer_CalcActivations(Layer *l, Matrix *input) {
     Matrix_Zeros(l->z);
     Matrix_Multiply(l->w, input, l->z);
-    //printf("\nlayer calc activations: input(%zu,%zu), layer w(%zu,%zu), layer z(%zu,%zu) layer b(%zu,%zu)\n",input->rows,input->cols,l->w->rows,l->w->cols,l->z->rows,l->z->cols,l->b->rows,l->b->cols);
-
+    
     for (int i = 0; i < l->z->rows; i++) {
         l->z->values[i] += l->b->values[i];
     }
     
-    for (int i = 0; i < l->a->rows * l->a->cols; i++){
+    for (int i = 0; i < l->a->rows; i++){
         l->a->values[i] = (*l->activationFunc)(l->z->values[i]);
     }
 }
