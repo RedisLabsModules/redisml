@@ -7,15 +7,15 @@
 The following code creates a [random forest](https://en.wikipedia.org/wiki/Random_forest) under the key `myforest` that consists of three trees with IDs ranging from 0 to 2, where each consists of a single numeric splitter and its predicate values. Afterwards, the forest is used to classify two inputs and yield their predictions.
 
 ```
-redis> ML.FOREST.ADD myforst 0 . NUMERIC 1 0.1 .l LEAF 1 .r LEAF 0
+redis> ML.FOREST.ADD myforest 0 . NUMERIC 1 0.1 .l LEAF 1 .r LEAF 0
 OK
-redis> ML.FOREST.ADD myforst 1 . NUMERIC 1 0.1 .l LEAF 1 .r LEAF 0
+redis> ML.FOREST.ADD myforest 1 . NUMERIC 1 0.1 .l LEAF 1 .r LEAF 0
 OK
-redis> ML.FOREST.ADD myforst 2 . NUMERIC 1 0.1 .l LEAF 0 .r LEAF 1
+redis> ML.FOREST.ADD myforest 2 . NUMERIC 1 0.1 .l LEAF 0 .r LEAF 1
 OK
-redis> ML.FOREST.RUN myforst 1:0.01 CLASSIFICATION
+redis> ML.FOREST.RUN myforest 1:0.01 CLASSIFICATION
 "1"
-redis> ML.FOREST.RUN myforst 1:0.2 CLASSIFICATION
+redis> ML.FOREST.RUN myforest 1:0.2 CLASSIFICATION
 "0"
 ```
 
@@ -60,7 +60,7 @@ Bulk string reply: the predicted value of the sample
 ## **Linear regression**
 
 ### Example of use
-The first line of the example shows how a linear regression predictor is set to the key named `linear`. The predictor has an intercept of 2 and its coefficients are 3, 4 and 5. Once the predicator is ready, it is used to predict the result given the independent variables' values (features) of 1, 1 and 1.
+The first line of the example shows how a linear regression predictor is set to the key named `linear`. The predictor has an intercept of 2 and its coefficients are 3, 4 and 5. Once the predictor is ready, it is used to predict the result given the independent variables' values (features) of 1, 1 and 1.
 
 ```
 redis> ML.LINREG.SET linear 2 3 4 5
@@ -103,7 +103,7 @@ Bulk string reply: the predicted result for the feature set
 
 ### Example of use
 
-In this example, the first line shows how a logistic regression predictor is set to the key named `logistic`. The predictor has an intercept of 0 and its coefficients are 2 and 2. Once the predicator is ready, it is used to predict the result given the independent variables' values (features) of -3 and 1.
+In this example, the first line shows how a logistic regression predictor is set to the key named `logistic`. The predictor has an intercept of 0 and its coefficients are 2 and 2. Once the predictor is ready, it is used to predict the result given the independent variables' values (features) of -3 and 1.
 
 ```
 redis> ML.LOGREG.SET logistic 0 2 2
