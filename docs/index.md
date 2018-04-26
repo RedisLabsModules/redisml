@@ -47,4 +47,4 @@ Issue reports, pull and feature requests are welcome.
 
 ## License
 
-AGPLv3 - see [LICENSE](LICENSE)
+AGPLv3 - see [LICENSE](https://github.com/RedisLabsModules/redis-ml/blob/master/LICENSE)
