@@ -33,11 +33,13 @@ void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
             //printf("b[2]:\n");
             //Matrix_Print(n->layers[2]->b, 0);
         }
+#ifdef DEBUG        
+        printf("dw[2]:\n");
+        Matrix_Print(n->layers[2]->wDelta, 0);
+        printf("db[2]:\n");
+        Matrix_Print(n->layers[2]->bDelta, 0);
+#endif        
         NN_Eval(n, 10000);
-        printf("w[2]:\n");
-        Matrix_Print(n->layers[2]->w, 0);
-        printf("b[2]:\n");
-        Matrix_Print(n->layers[2]->b, 0);
     }
 }
 
@@ -52,27 +54,53 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
         lp = n->layers[n->nlayers - 2];
         //printf("******* START BP %d\n", i - offset);
         feedForward(n, &n->trainingData->features[i * n->trainingData->featureSize]);
-        //printf("activations:\n");
-        //Matrix_Print(l->a, 0);
-        //printf("z:\n");
-        //Matrix_Print(l->z, 5);
-        //printf("w:\n");
-        //Matrix_Print(l->w, 5);
-        //printf("b:\n");
-        //Matrix_Print(l->b, 5);
         int class  = n->trainingData->labels[i];
         //calculate delta for the last layer:
+        float sp = 0;
+        float cd = 0;
         for (int i = 0; i < l->delta->rows; i++){
-            l->delta->values[i] = n->costDerivativeFunc(l->a->values[i], i==class?1:0) * SigmoidPrime(l->z->values[i]);
+            sp = SigmoidPrime(l->z->values[i]);
+            cd = n->costDerivativeFunc(l->a->values[i], i==class?1:0); 
+            l->delta->values[i] = sp * cd;
+            //printf("sp = %.12f, cd = %f\n", sp, cd);
             l->bDelta->values[i] = l->delta->values[i];
         }
-
+#ifdef DEBUG
+        printf("activations:\n");
+        Matrix_Print(l->a, 0);
+        printf("z:\n");
+        Matrix_Print(l->z, 0);
+        printf("w:\n");
+        Matrix_Print(l->w, 0);
+        printf("b:\n");
+        Matrix_Print(l->b, 0);
+        printf("delta:\n");
+        Matrix_Print(l->delta, 0);
+#endif
         Matrix *lpat = Matrix_New(lp->a->cols, lp->a->rows);
         Matrix_Transpose(lp->a, lpat);
+#ifdef DEBUG
+        printf("lpa:\n");
+        Matrix_Print(lp->a, 0);
+        printf("lpat:\n");
+        Matrix_Print(lpat, 0);
+#endif
         Matrix_Zeros(l->wDelta);
         Matrix_Multiply(l->bDelta, lpat, l->wDelta);
         Matrix_Free(lpat);
-
+        /*
+        int p = l->wDelta->rows * l->wDelta->cols -1;
+        if (l->wDelta->values[p] != l->wDelta->values[p-1]){
+            printf("exit on cycle: %d\n", i);
+            exit(0);
+        }
+        */
+#ifdef DEBUG
+        printf("lpa diffs:\n");
+        Matrix_PrintDiffs(lp->a);
+        printf("lwdelta diffs:\n");
+        Matrix_PrintDiffs(l->wDelta);
+#endif
         //printf("bDeltaL:\n");
         //Matrix_Print(l->bDelta, 0);
         //backprop through the rest of the layers
@@ -83,8 +111,8 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             
             Matrix *lntw = Matrix_New(ln->w->cols, ln->w->rows);
             Matrix_Transpose(ln->w, lntw);
-            Matrix_Zeros(l->bDelta);
-            Matrix_Multiply(lntw, ln->delta, l->bDelta);
+            Matrix_Zeros(l->delta);
+            Matrix_Multiply(lntw, ln->delta, l->delta);
             //printf("z0:\n");
             //Matrix_Print(l->z, 0);
             //printf("b0:\n");
@@ -95,7 +123,8 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             //printf("old delta:\n");
             //Matrix_Print(ln->delta, 0);
             for (int i = 0; i < l->bDelta->rows; i++){
-                l->bDelta->values[i] *=  SigmoidPrime(l->z->values[i]);
+                l->delta->values[i] *=  SigmoidPrime(l->z->values[i]);
+                l->bDelta->values[i] = l->delta->values[i];
             }
             //printf("new delta:\n");
             //Matrix_Print(l->bDelta, 0);
@@ -121,8 +150,8 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
 
 
 void feedForward(Network *n, float *features){
-    //memcpy(n->layers[0]->a->values, features, n->layers[0]->a->rows * sizeof(float));
-    n->layers[0]->a->values =  features;
+    memcpy(n->layers[0]->a->values, features, n->layers[0]->a->rows * sizeof(float));
+    //n->layers[0]->a->values =  features;
     for (int i = 1; i < n->nlayers; i++){
         Layer_CalcActivations(n->layers[i], n->layers[i-1]->a);
     }

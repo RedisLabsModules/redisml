@@ -96,9 +96,10 @@ int main (int argc, char**argv) {
     }
     fclose(f);
     /*
-    int l = 0;
-    for (int i = 0; i < 7840; i+= 784){
-        printf("\n\nlabel = %u\n", trainingLabels[l++]);
+    int l = 50000;
+    for (int i = (784 * l); i < ((50003) * 784); i+= 784){
+        printf("\n\nlabel = %u, l=%d\n", trainingLabels[l], l);
+        l++;
         printDigit(&trainingData[i]);
     }
     */

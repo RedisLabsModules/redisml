@@ -25,11 +25,21 @@ void Matrix_Print(Matrix *m, size_t max) {
                 printf("\n");
                 return;
             }
-            printf("%f, ", MATRIX(m, i, j));
+            printf("%.12f, ", MATRIX(m, i, j));
         }
         printf("\n");
     }
 }
+
+void Matrix_PrintDiffs(Matrix *m){
+    for (int i = 1; i < m->rows * m->cols; i++) {
+        if(m->values[i] != m->values[i-1]){
+            printf("%d, %f\n", i, m->values[i] - m->values[i-1]);
+        }
+    }
+}
+
+
 
 void Matrix_Transpose(Matrix *m, Matrix *mt) {
     for (int i = 0; i < m->rows; i++) {
@@ -53,6 +63,7 @@ int Matrix_IsEqual(Matrix *a, Matrix *b) {
 }
 
 void Matrix_Multiply(Matrix *a, Matrix *b, Matrix* c) {
+    Matrix_Zeros(c);
 #ifdef USE_BLAS
     cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, a->rows, b->cols, a->cols,
         1, a->values, a->cols, b->values, b->cols, 0, c->values, b->cols);
