@@ -85,7 +85,7 @@ int main (int argc, char**argv) {
     printf("nlabels: %d\n", nimages);
 
     /* allocate training labels */
-    unsigned char* trainingLabels = calloc(nimages, sizeof(unsigned char));
+    unsigned char* trainingLabels = calloc(nimages, sizeof(char));
     rsize = fread(trainingLabels, 1, nimages, f);
     if (rsize != nimages){
         printf("error loading file to memory, read %zu bytes\n", rsize);
@@ -105,6 +105,7 @@ int main (int argc, char**argv) {
     /* init the network */
     Network *n = malloc(sizeof(Network));
     n->nlayers = 3;
+    n->nclasses = 10;
     n->layers = malloc(n->nlayers * sizeof(Layer *));
     n->trainingData = malloc(sizeof(DataSet));
     //n->trainingData->nSamples = nimages/10;
@@ -112,7 +113,10 @@ int main (int argc, char**argv) {
     n->trainingData->featureSize = rows * cols;
     n->trainingData->features = trainingData;
     n->trainingData->labels = trainingLabels;
-
+    n->trainingData->binarylabels = calloc(nimages * 10, sizeof(float));
+    for (int i = 0; i < nimages; i++){
+        n->trainingData->binarylabels[i * 10 + n->trainingData->labels[i]] = 1;
+    }
 
     n->layers[0] = Layer_Init(rows * cols, 1,FULLY_CONNECTED, SIGMOID);
     n->layers[1] = Layer_Init(100, rows * cols, FULLY_CONNECTED, RELU);
@@ -129,13 +133,13 @@ int main (int argc, char**argv) {
     */
     //printf("a0:\n");
     //Matrix_Print(n->layers[0]->a, 0);    
-    /*for (int i = 0; i < 5; i++){
-        printf("\nactivation[%d]: \n", i);
-        feedForward(n, &trainingData[i * 784]);
-        //Matrix_Print(n->layers[0]->a, 0);    
-        printf("a %d:\n",i);
-        Matrix_Print(n->layers[2]->a, 0);    
-    }*/
+    for (int i = 0; i < 55; i++){
+        printf("label = [%d], bin  = ", trainingLabels[i]);
+        for (int j = 0; j < 10; j++){
+            printf("%.2f, ", n->trainingData->binarylabels[i*10+j]);
+        }
+        printf("\n");
+    }
 
     NN_Eval(n, 50000, 10000);
     NN_SGD(n, cycles, batchSize, learningRate);

@@ -1,12 +1,21 @@
 #include "network.h"
 
-float CostSSE(float x, float y){
+float CostSSE(float *x, float *y){
+    return (*x -*y) * (*x - *y);
+}
+
+float CostSSEDeriv(float *x, float *y){
+    return *x - *y;
+}
+
+float CostCES(float *x, float *y){
     return (x - y) * (x - y);
 }
 
-float CostSSEDeriv(float x, float y){
+float CostCESDeriv(float *x, float *y){
     return x - y;
 }
+
 
 void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
     Layer *l;
@@ -54,13 +63,13 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
         lp = n->layers[n->nlayers - 2];
         //printf("******* START BP %d\n", i - offset);
         feedForward(n, &n->trainingData->features[i * n->trainingData->featureSize]);
-        int class  = n->trainingData->labels[i];
+        float *labels = n->trainingData->binarylabels + i * n->nclasses;
         //calculate delta for the last layer:
         float sp = 0;
         float cd = 0;
         for (int i = 0; i < l->delta->rows; i++){
             sp = l->activationDerivativeFunc(l->z->values[i]);
-            cd = n->costDerivativeFunc(l->a->values[i], i==class?1:0); 
+            cd = n->costDerivativeFunc(&l->a->values[i], &labels[i]); 
             l->delta->values[i] = sp * cd;
             //printf("sp = %.12f, cd = %f\n", sp, cd);
             l->bDelta->values[i] = l->delta->values[i];
