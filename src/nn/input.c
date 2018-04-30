@@ -20,9 +20,6 @@ int getInt32(unsigned char *buff, FILE *f) {
     return 0;
 }
 
-/*
- * args: training_data, cycles, mini_batch_size, eta,                test_data=None):
- */
 int main (int argc, char**argv) {
 
     if (argc != 6) {
@@ -118,8 +115,8 @@ int main (int argc, char**argv) {
 
 
     n->layers[0] = Layer_Init(rows * cols, 1,FULLY_CONNECTED, SIGMOID);
-    n->layers[1] = Layer_Init(30, rows * cols, FULLY_CONNECTED, SIGMOID);
-    n->layers[2] = Layer_Init(10, 30, FULLY_CONNECTED, SIGMOID);
+    n->layers[1] = Layer_Init(100, rows * cols, FULLY_CONNECTED, RELU);
+    n->layers[2] = Layer_Init(10, 100, FULLY_CONNECTED, SOFTMAX);
     n->costDerivativeFunc = &CostSSEDeriv;
     
     /*
@@ -140,7 +137,7 @@ int main (int argc, char**argv) {
         Matrix_Print(n->layers[2]->a, 0);    
     }*/
 
-    NN_Eval(n, 10000);
+    NN_Eval(n, 50000, 10000);
     NN_SGD(n, cycles, batchSize, learningRate);
     /*
     NN_Eval(n, 10000);

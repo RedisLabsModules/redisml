@@ -4,11 +4,15 @@
 #include <math.h>
 
 float Sigmoid(float x);
-float SigmoidPrime(float x);
+float SigmoidDeriv(float x);
+float Relu(float x);
+float ReluDeriv(float x);
 
 typedef enum {
     FULLY_CONNECTED,
     CONVOLUTIONAL,
+    MAX_POOLING,
+    DROPOUT,
     OUTPUT
 } LayerType;
 
@@ -39,6 +43,7 @@ typedef struct layer{
 Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType activationType);
 void Layer_CalcActivations(Layer *l, Matrix *input);
 
+void Softmax(Layer *l);
 
 
 #endif //__LAYER_H__

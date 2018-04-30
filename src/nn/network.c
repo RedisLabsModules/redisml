@@ -39,7 +39,7 @@ void NN_SGD(Network *n, size_t cycles, size_t batchSize, float rate){
         printf("db[2]:\n");
         Matrix_Print(n->layers[2]->bDelta, 0);
 #endif        
-        NN_Eval(n, 10000);
+        NN_Eval(n, 50000, 10000);
     }
 }
 
@@ -59,7 +59,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
         float sp = 0;
         float cd = 0;
         for (int i = 0; i < l->delta->rows; i++){
-            sp = SigmoidPrime(l->z->values[i]);
+            sp = l->activationDerivativeFunc(l->z->values[i]);
             cd = n->costDerivativeFunc(l->a->values[i], i==class?1:0); 
             l->delta->values[i] = sp * cd;
             //printf("sp = %.12f, cd = %f\n", sp, cd);
@@ -123,7 +123,7 @@ void runMiniBatch(Network *n, int offset, size_t batchSize, float rate){
             //printf("old delta:\n");
             //Matrix_Print(ln->delta, 0);
             for (int i = 0; i < l->bDelta->rows; i++){
-                l->delta->values[i] *=  SigmoidPrime(l->z->values[i]);
+                l->delta->values[i] *=  l->activationDerivativeFunc(l->z->values[i]);
                 l->bDelta->values[i] = l->delta->values[i];
             }
             //printf("new delta:\n");
@@ -170,9 +170,9 @@ int getMaxActivation(Network *n){
     return index;
 }
 
-void NN_Eval(Network *n, int numSamples){
+void NN_Eval(Network *n, int start, int numSamples){
     int ok = 0;
-    for (int i = 0; i < numSamples; i++){
+    for (int i = start; i < start + numSamples; i++){
         feedForward(n, &n->trainingData->features[i * n->trainingData->featureSize]);
         if (n->trainingData->labels[i] == getMaxActivation(n)){
             ok++;

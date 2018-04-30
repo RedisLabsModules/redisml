@@ -40,6 +40,6 @@ void feedForward(Network *n, float *features);
 
 int getMaxActivation(Network *n);
 
-void NN_Eval(Network *n, int numSamples);
+void NN_Eval(Network *n, int start, int numSamples);
  
 #endif //__NETWORK_H__

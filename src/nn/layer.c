@@ -23,11 +23,30 @@ float box_muller(){
 
 
 float Sigmoid(float x){
-        return 1 / (1 + expf(-x));
+    return 1 / (1 + expf(-x));
 }
 
-float SigmoidPrime(float x){
+float SigmoidDeriv(float x){
     return Sigmoid(x) * (1 - Sigmoid(x));
+}
+
+float Relu(float x){
+    return x > 0 ? x : 0;
+}
+
+float ReluDeriv(float x){
+    return x > 0 ? 1 : 0;
+}
+
+void Softmax(Layer *l){
+    float sum = 0;
+    for (int j=0; j < l->z->rows; j++){
+        l->a->values[j] = expf(l->z->values[j]);
+        sum += l->a->values[j];
+    }
+    for (int j=0; j < l->z->rows; j++){
+        l->a->values[j] /= sum;
+    }
 }
 
 Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType activationType) {
@@ -49,10 +68,16 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
     switch (activationType) {
         case SIGMOID:
             l->activationFunc = &Sigmoid;
-            l->activationDerivativeFunc = &SigmoidPrime;
+            l->activationDerivativeFunc = &SigmoidDeriv;
+            break;
+        case RELU:
+            l->activationFunc = &Relu;
+            l->activationDerivativeFunc = &ReluDeriv;
+            break;
         default:
             l->activationFunc = &Sigmoid;
-            l->activationDerivativeFunc = &SigmoidPrime;
+            l->activationDerivativeFunc = &SigmoidDeriv;
+            break;
     }
     
     float wsqrt = sqrt(l->w->cols);
@@ -70,13 +95,20 @@ Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType 
 void Layer_CalcActivations(Layer *l, Matrix *input) {
     Matrix_Zeros(l->z);
     Matrix_Multiply(l->w, input, l->z);
-    
     for (int i = 0; i < l->z->rows; i++) {
         l->z->values[i] += l->b->values[i];
     }
     
-    for (int i = 0; i < l->a->rows; i++){
-        l->a->values[i] = (*l->activationFunc)(l->z->values[i]);
+    switch(l->activationType){
+        case SIGMOID:
+        case RELU:
+            for (int i = 0; i < l->a->rows; i++){
+                l->a->values[i] = (*l->activationFunc)(l->z->values[i]);
+            }
+            break;
+        case SOFTMAX:
+           Softmax(l);
+           break; 
     }
 }
 
