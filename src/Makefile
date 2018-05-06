@@ -55,5 +55,8 @@ test:
 .PHONY: clean
 clean:
 	rm -rf *.xo *.so *.o
+	$(MAKE) -C ./rmutil clean
+	$(MAKE) -C ./test clean
+	$(MAKE) -C ./util clean
 
 include Makefile.package

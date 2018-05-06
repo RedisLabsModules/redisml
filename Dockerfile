@@ -1,12 +1,30 @@
-FROM ubuntu
+FROM redis:latest as builder
 
-RUN apt-get -y update && apt-get install -y build-essential git libatlas-base-dev
-RUN git clone https://github.com/antirez/redis.git
-RUN git clone https://github.com/RedisLabsModules/redis-ml.git
-RUN cd redis && make && make install
-RUN cd ..
-RUN cd redis-ml/src && make
+ENV LIBDIR /var/lib/redis/modules
+ENV DEPS "libatlas-base-dev python python-setuptools python-pip wget unzip build-essential"
 
-EXPOSE 6379
-CMD ["redis-server", "--bind", "0.0.0.0", "--loadmodule", "/redis-ml/src/redis-ml.so"]
+# Set up a build environment
+RUN set -ex;\
+    deps="$DEPS";\
+    apt-get update; \
+	apt-get install -y --no-install-recommends $deps;\
+    pip install rmtest; 
 
+# Build the source
+ADD . /
+WORKDIR /
+RUN set -ex;\
+    deps="$DEPS";\
+    make clean; \
+    make all -j 4; \
+    make test;
+
+# Package the runner
+FROM redis:latest
+ENV LIBDIR /usr/lib/redis/modules
+WORKDIR /data
+RUN set -ex;\
+    mkdir -p "$LIBDIR";
+COPY --from=builder /src/redis-ml.so  "$LIBDIR"
+
+CMD ["redis-server", "--loadmodule", "/var/lib/redis/modules/redis-ml.so"]
