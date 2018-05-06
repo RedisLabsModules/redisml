@@ -4,3 +4,7 @@ CC=gcc
 .SUFFIXES: .c .so .xo .o
 
 all: logging.o thpool.o 
+
+clean:
+	rm -rf *.xo *.so *.o
+
