@@ -8,12 +8,16 @@ float CostSSEDeriv(float *x, float *y){
     return *x - *y;
 }
 
-float CostCES(float *x, float *y){
-    return (x - y) * (x - y);
+float CostCES(float *a, float *y){
+    float sum = 0;
+    for(int i = 0; i < 10; i++){
+        sum += -y[i]*logf(a[i]) - (1 - y[i]) * logf(1 - a[i]);
+    }
+    return sum;
 }
 
 float CostCESDeriv(float *x, float *y){
-    return x - y;
+    return *x - *y;
 }
 
 
