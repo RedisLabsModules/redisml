@@ -7,7 +7,6 @@ RUN cd redis && make && make install
 RUN cd ..
 RUN cd redis-ml/src && make
 
-COPY src/demo.rdb /dump.rdb
 EXPOSE 6379
 CMD ["redis-server", "--bind", "0.0.0.0", "--loadmodule", "/redis-ml/src/redis-ml.so"]
 
