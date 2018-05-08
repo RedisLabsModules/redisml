@@ -54,9 +54,12 @@ test:
 
 .PHONY: clean
 clean:
-	rm -rf *.xo *.so *.o
+	rm -rf *.xo *.so *.o print_version
 	$(MAKE) -C ./rmutil clean
 	$(MAKE) -C ./test clean
 	$(MAKE) -C ./util clean
+
+print_version: version.h print_version.c
+	@$(CC) -o $@ -DPRINT_VERSION_TARGET $@.c
 
 include Makefile.package
