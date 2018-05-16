@@ -8,7 +8,7 @@ RUN set -ex;\
     deps="$DEPS";\
     apt-get update; \
 	apt-get install -y --no-install-recommends $deps;\
-    pip install rmtest; 
+    pip install rmtest;
 
 # Build the source
 ADD . /
@@ -21,7 +21,7 @@ RUN set -ex;\
 
 # Package the runner
 FROM redis:latest
-ENV LIBDIR /usr/lib/redis/modules
+ENV LIBDIR /var/lib/redis/modules
 WORKDIR /data
 RUN set -ex;\
     mkdir -p "$LIBDIR";
