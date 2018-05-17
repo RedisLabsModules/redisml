@@ -38,10 +38,16 @@ typedef struct layer{
     Matrix *wDelta;
     Matrix *bDelta;
     Matrix *delta;
+    Matrix **conv_a;
+    Matrix **filters;
+    size_t nfilters;
+    size_t padding;
+    size_t stride;
 } Layer;
 
 Layer *Layer_Init(size_t size, size_t inputSize, LayerType type, ActivationType activationType);
 void Layer_CalcActivations(Layer *l, Matrix *input);
+void Layer_ConvCalcActivations(Layer *l, Matrix *input);
 
 void Softmax(Layer *l);
 

@@ -35,7 +35,7 @@ float Relu(float x){
 }
 
 float ReluDeriv(float x){
-    return x > 0 ? 1 : 0;
+    return x > 0;
 }
 
 void Softmax(Layer *l){
@@ -113,4 +113,27 @@ void Layer_CalcActivations(Layer *l, Matrix *input) {
 }
 
 
+void Layer_ConvCalcActivations(Layer *l, Matrix *input) {
+    int frows = l->filters[0]->rows;
+    int fcols = l->filters[0]->cols;
+    int inrows = input->rows - l->padding - frows + 1;
+    int incols = input->cols - l->padding - frows + 1;
+    int in_x, in_y, out_x, out_y, f_x, f_y;
+    Matrix *a;
+    for (int f = 0; f < l->nfilters; f++){
+        a = l->conv_a[f];
+        for (in_x = l->padding; in_x < inrows; in_x += l->stride){
+            out_x = (in_x - l->padding) / l->stride;
+            for (in_y = l->padding; in_y < incols; in_y += l->stride){
+                out_y = (in_y - l->padding) / l->stride;
+                MATRIX(a, out_x, out_y) = 0;  
+                for (f_x = 0; f_x < frows; f_x++){
+                    for (f_y = 0; f_y < fcols; f_y++){
+                        MATRIX(a, out_x, out_y) += MATRIX(input, in_x + f_x, in_y + f_y) * MATRIX(l->filters[f], f_x, f_y);  
+                    }
+                }
+            }
+        } 
+    }
+}
 
