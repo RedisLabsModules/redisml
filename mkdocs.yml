@@ -2,6 +2,11 @@ site_name: Redis ML Documentation
 site_url: https://redislabsmodules.github.io/redis-ml/
 repo_url: https://github.com/RedisLabsModules/redis-ml
 repo_name: RedisLabsModules/redis-ml
+
+google_analytics:
+  - 'UA-92003007-8'
+  - 'auto'
+
 theme: material
 
 extra:
