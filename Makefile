@@ -1,3 +1,6 @@
+INDELUCES=./deps/tensorflow/include
+DEPS=./deps/tensorflow/lib
+
 all:
 	$(MAKE) -C ./src all
 

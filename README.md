@@ -354,3 +354,16 @@ Issue reports, pull and feature requests are welcome.
 ## License
 
 AGPLv3 - see [LICENSE](LICENSE)
+
+
+
+
+
+gcc -I/usr/local/include -L/usr/local/lib hello_tf.c -ltensorflow
+
+
+
+
+
+sudo apt-get install python-numpy python-dev python-pip python-wheel
+sudo apt-get install pkg-config zip g++ zlib1g-dev unzip python
