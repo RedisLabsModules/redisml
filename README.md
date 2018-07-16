@@ -353,4 +353,4 @@ Issue reports, pull and feature requests are welcome.
 
 ## License
 
-AGPLv3 - see [LICENSE](LICENSE)
+Apache 2.0 with Commons Clause - see [LICENSE](LICENSE)
