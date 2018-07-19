@@ -26,6 +26,8 @@ theme:
 pages:
     - 'Quickstart': 'index.md'
     - 'Commands': 'commands.md'
+    - 'Contributor agreement': 'contrib.md'
+
     
 markdown_extensions:
   - admonition
