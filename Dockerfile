@@ -21,10 +21,10 @@ RUN set -ex;\
 
 # Package the runner
 FROM redis:latest
-ENV LIBDIR /var/lib/redis/modules
+ENV LIBDIR /usr/lib/redis/modules
 WORKDIR /data
 RUN set -ex;\
     mkdir -p "$LIBDIR";
 COPY --from=builder /src/redis-ml.so  "$LIBDIR"
 
-CMD ["redis-server", "--loadmodule", "/var/lib/redis/modules/redis-ml.so"]
+CMD ["redis-server", "--loadmodule", "/usr/lib/redis/modules/redis-ml.so"]
