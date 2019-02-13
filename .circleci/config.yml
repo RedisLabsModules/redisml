@@ -6,6 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install prerequisite
+          command: apt-get install libatlas-base-dev
+      - run:
           name: Build
           command: make -j 8
       - run:
