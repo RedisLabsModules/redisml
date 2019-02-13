@@ -1,6 +1,8 @@
-![docs/images/logo.png](docs/images/logo.png)
-
+[![GitHub issues](https://img.shields.io/github/release/RedisLabsModules/redis-ml.svg)](https://github.com/RedisLabsModules/redis-ml/releases/latest)
 [![CircleCI](https://circleci.com/gh/RedisLabsModules/redis-ml.svg?style=svg)](https://circleci.com/gh/RedisLabsModules/redis-ml)
+[![DockerHub](https://dockerbuildbadges.quelltext.eu/status.svg?organization=redislabs&repository=redisml)](https://hub.docker.com/r/redislabs/redisml/builds/) 
+
+![docs/images/logo.png](docs/images/logo.png)
 
 # Machine Learning Model Server on Redis
 
