@@ -1,5 +1,5 @@
-[![GitHub issues](https://img.shields.io/github/release/RedisLabsModules/redis-ml.svg)](https://github.com/RedisLabsModules/redis-ml/releases/latest)
-[![CircleCI](https://circleci.com/gh/RedisLabsModules/redis-ml.svg?style=svg)](https://circleci.com/gh/RedisLabsModules/redis-ml)
+[![GitHub issues](https://img.shields.io/github/release/RedisLabsModules/redisml.svg)](https://github.com/RedisLabsModules/redisml/releases/latest)
+[![CircleCI](https://circleci.com/gh/RedisLabsModules/redisml.svg?style=svg)](https://circleci.com/gh/RedisLabsModules/redisml)
 [![DockerHub](https://dockerbuildbadges.quelltext.eu/status.svg?organization=redislabs&repository=redisml)](https://hub.docker.com/r/redislabs/redisml/builds/) 
 
 ![docs/images/logo.png](docs/images/logo.png)
@@ -8,11 +8,11 @@
 
 ## Overview
 
-Redis-ML is a Redis module that implements several machine learning models as Redis data types.
+RedisML is a Redis module that implements several machine learning models as Redis data types.
 
 The stored models are fully operational and support the prediction/evaluation process.
 
-Redis-ML is a turnkey solution for using trained models in a production environment. Load ML models from any platform, immediately ready to serve.
+RedisML is a turnkey solution for using trained models in a production environment. Load ML models from any platform, immediately ready to serve.
 
 See Full Documentation at http://redisml.io
 
@@ -41,15 +41,15 @@ See Full Documentation at http://redisml.io
   ln -s /usr/lib64/atlas/libtatlas.so /usr/lib64/libcblas.a 
   ```
 
-- Build the Redis-ML module:
+- Build the RedisML module:
 
   ```sh
-  git clone https://github.com/RedisLabsModules/redis-ml.git
-  cd redis-ml/src
+  git clone https://github.com/RedisLabsModules/redisml.git
+  cd redisml/src
   make
   ```
 
-- To load the module, start Redis with the `--loadmodule /path/to/redis-ml/src/redis-ml.so` option, add it as a directive to the configuration file or send a `MODULE LOAD` command.
+- To load the module, start Redis with the `--loadmodule /path/to/redisml/src/redis-ml.so` option, add it as a directive to the configuration file or send a `MODULE LOAD` command.
 
 # Redis ML Commands
 
@@ -357,4 +357,4 @@ Issue reports, pull and feature requests are welcome.
 
 ## License
 
-Apache 2.0 with Commons Clause - see [LICENSE](LICENSE)
+Redis Source Available License Agreement - see [LICENSE](LICENSE)
