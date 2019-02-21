@@ -1,4 +1,4 @@
-# **Redis ML Commands**
+# **RedisML Commands**
 
 ## **Decision tree ensembles**
 
