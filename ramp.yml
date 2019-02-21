@@ -1,4 +1,4 @@
-display_name: Redis-ML
+display_name: RedisML
 author: RedisLabs
 email: shay@redislabs.com
 description: Machine learning model server on Redis
