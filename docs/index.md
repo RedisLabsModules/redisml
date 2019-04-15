@@ -1,3 +1,7 @@
+---
+#### Notice RedisML is planned to be replaced by [RedisAI](http://redisai.io), adding support for deep learning.
+***
+
 # Machine Learning Model Server on Redis
 
 RedisML is a Redis module that implements several machine learning models as Redis data types.
