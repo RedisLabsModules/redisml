@@ -1,3 +1,7 @@
+---
+#### Notice RedisML is planned to be replaced by [RedisAI](http://redisai.io), adding support for deep learning.
+***
+
 [![GitHub issues](https://img.shields.io/github/release/RedisLabsModules/redisml.svg)](https://github.com/RedisLabsModules/redisml/releases/latest)
 [![CircleCI](https://circleci.com/gh/RedisLabsModules/redisml.svg?style=svg)](https://circleci.com/gh/RedisLabsModules/redisml)
 [![DockerHub](https://dockerbuildbadges.quelltext.eu/status.svg?organization=redislabs&repository=redisml)](https://hub.docker.com/r/redislabs/redisml/builds/) 
