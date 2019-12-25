@@ -73,8 +73,8 @@ __forest_Node *Forest_NewLeaf(double predVal, char* stats) {
             len++;
         }
     }else{
-        len = (int)predVal + 1;
-        total = 1; 
+        len = 1;
+        total = 1;
         n->stats = calloc(len ,sizeof(double));
         n->stats[len-1] = 1;
     }
@@ -437,7 +437,7 @@ typedef struct {
 taskArgs ta;
 
 static void classifierTask(void *id){
-    int tid = *(int *)id; 
+    int tid = *(int *)id;
     int resOffset = tid * FOREST_MAX_CLASSES;
     int tStart = tid * ta.skip;
     int tEnd = tStart + ta.skip > ta.f->len ? ta.f->len : tStart + ta.skip;
@@ -458,11 +458,11 @@ double Forest_Classify(FeatureVec fv, Forest *f, int classification) {
     double results[FOREST_MAX_CLASSES][2] = {{0}};
     int tids[FOREST_NUM_THREADS];
     double rep = 0;
-    
+
     ta.res = &threadResults[0];
     ta.fv = &fv;
     ta.f = f;
-    ta.skip = (f->len + 1) / FOREST_NUM_THREADS; 
+    ta.skip = (f->len + 1) / FOREST_NUM_THREADS;
 
     if (classification) {
         LG_DEBUG("\nclassification:");
