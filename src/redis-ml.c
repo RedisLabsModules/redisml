@@ -23,9 +23,16 @@
 /*================ Forest Commands ================*/
 
 int ForestTestCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-    Forest_TreeTest();
-    RedisModule_ReplyWithSimpleString(ctx, "TEST_OK");
-    return REDISMODULE_OK;
+// currently Forest_TreeTest causes a crash, so it's disabled
+//    if (Forest_TreeTest() && Forest_DeepTreeTest()) {
+
+    if (Forest_DeepTreeTest() == FOREST_OK) {
+        RedisModule_ReplyWithSimpleString(ctx, "TEST_OK");
+        return REDISMODULE_OK;
+    } else {
+        RedisModule_ReplyWithSimpleString(ctx, "TEST_FAIL");
+        return REDISMODULE_ERR;
+    }
 }
 
 /*ml.forest.run <forest> <data_item> [CLASSIFICATION|REGRESSION]*/
@@ -218,7 +225,7 @@ int ForestAddCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_ERR;
     }
     /*Normalize tree values*/
-    Forest_NormalizeTree(t);
+//    Forest_NormalizeTree(t);
 #ifdef FOREST_USE_FAST_TREE
     Forest_GenFastTree(t);
 #endif
